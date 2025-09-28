@@ -14,7 +14,7 @@ export type File = {
   // Add other properties as needed
 };
 import ChatInterface from "../ChatInterface/ChatInterface";
-const BUCKET_NAME = process.env.MINIO_BUCKET_NAME || "buhoknowler";
+const BUCKET_NAME = process.env.MINIO_BUCKET_NAME || "mermaid";
 
 export default function GlosarioVisualizer({ file, asignatura, onClose }: { file: File; asignatura?: string; onClose: () => void; }) {
   // Obtener extensión del archivo
@@ -29,12 +29,12 @@ export default function GlosarioVisualizer({ file, asignatura, onClose }: { file
   // Cargar el PDF, TXT o DOCX
   useEffect(() => {
     if (fileExtension === "pdf") {
-      fetch(`/api/files/presigned-url?file=${file.filepath}&bucket=${BUCKET_NAME}`)
+      fetch(`/api/presigned-url?file=${file.filepath}&bucket=${BUCKET_NAME}`)
         .then((res) => res.json())
         .then((data) => setFileUrl(data.url))
         .catch((err) => console.error("Error obteniendo la URL del PDF:", err));
     } else if (fileExtension === "txt") {
-      fetch(`/api/files/presigned-url?file=${file.filepath}&bucket=${BUCKET_NAME}`)
+      fetch(`/api/presigned-url?file=${file.filepath}&bucket=${BUCKET_NAME}`)
         .then((res) => res.json())
         .then((presignedData) => {
           if (presignedData.url) {
@@ -47,7 +47,7 @@ export default function GlosarioVisualizer({ file, asignatura, onClose }: { file
         .then((text) => setGlossaryText(text))
         .catch((err) => console.error("Error cargando el TXT:", err));
     } else if (fileExtension === "docx") {
-      fetch(`/api/files/presigned-url?file=${file.filepath}&bucket=${BUCKET_NAME}`)
+      fetch(`/api/presigned-url?file=${file.filepath}&bucket=${BUCKET_NAME}`)
         .then((res) => res.json())
         .then((data) => {
           if (data.url) {
@@ -64,7 +64,7 @@ export default function GlosarioVisualizer({ file, asignatura, onClose }: { file
   useEffect(() => {
     if (fileExtension === "pdf") {
       const txtFilePath = file.filepath.replace(/\.[^/.]+$/, "_glosarioIA.txt");
-      fetch(`/api/files/presigned-url?file=${txtFilePath}&bucket=${BUCKET_NAME}`)
+      fetch(`/api/presigned-url?file=${txtFilePath}&bucket=${BUCKET_NAME}`)
         .then((res) => res.json())
         .then((presignedData) => {
           if (presignedData.url) {

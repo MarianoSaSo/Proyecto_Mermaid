@@ -295,7 +295,7 @@ export default function FileList({
       // Construye el nuevo path (solo nombre del archivo al final)
       const filename = filepath.split("/").pop();
       const newPath = `${targetFolder}/${filename}`;
-      const res = await fetch("/api/files/move", {
+      const res = await fetch("/api/move", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -320,7 +320,7 @@ export default function FileList({
       // El destino será la carpeta destino + '/' + nombre de la carpeta origen
       const folderName = source.split("/").pop();
       const destPath = `${destination}/${folderName}`;
-      const res = await fetch("/api/files/move-folder", {
+      const res = await fetch("/api/move-folder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ source, destination: destPath }),
@@ -433,7 +433,7 @@ export default function FileList({
                 const folderPrefix = basePath + folderName;
 
                 // Crear la carpeta
-                const res = await fetch("/api/files/create-folder", {
+                const res = await fetch("/api/create-folder", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ folderPrefix }),
@@ -661,7 +661,7 @@ export default function FileList({
             setDeleteTarget(null);
           } else if (deleteTarget?.type === "folder") {
             try {
-              const res = await fetch("/api/files/delete-folder", {
+              const res = await fetch("/api/delete-folder", {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ folderPrefix: deleteTarget.item.path }),
