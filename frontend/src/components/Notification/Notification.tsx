@@ -22,8 +22,8 @@ export default function Notification({
 
   const imageSrc =
     type === "success"
-      ? "/folder_created.png" // Imagen cuando se crea correctamente
-      : "/folder_not_created.webp"; // Imagen cuando falla
+      ? "/uwaga2.jpg" // Imagen cuando se crea correctamente
+      : "/uwaga1.jpg"; // Imagen cuando falla
 
   const bgColor = type === "success" ? "bg-green-100" : "bg-red-100";
   const textColor = type === "success" ? "text-green-700" : "text-red-700";

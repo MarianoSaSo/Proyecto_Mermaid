@@ -35,7 +35,7 @@ export default function UploadForm({ ruta_prefix }: UploadFormProps) {
     formData.append("file", selectedFile);
     formData.append("ruta_prefix", ruta_prefix);
     try {
-      const response = await fetch(`/api/files`, {
+      const response = await fetch(`/api/upload`, {
         method: "POST",
         body: formData,
       });
