@@ -1,0 +1,5 @@
+>Create File
+New-Item requirements.txt -ItemType File
+
+>Update upfile after installing dependencies
+pip freeze > requirements.txt
