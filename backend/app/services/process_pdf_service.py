@@ -1,18 +1,34 @@
-from fastapi import HTTPException
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from minio import Minio
 from minio.error import S3Error
 from dotenv import load_dotenv
-from langchain.schema import Document
-from langchain_openai import OpenAIEmbeddings
-
-from pinecone import Pinecone
-import fitz  # PyMuPDF
 import os
+import fitz  # PyMuPDF
+from io import BytesIO
 import re
 import unicodedata
-from io import BytesIO
 
+from langchain.schema import Document
+# from langchain.text_splitter import RecursiveCharacterTextSplitter  # Ya no hace falta aquí
+from langchain_openai import OpenAIEmbeddings
+from pinecone import Pinecone
+
+# ----- CARGA VARIABLES DE ENTORNO -----
 load_dotenv()
+
+# ----- INICIAR FASTAPI -----
+app = FastAPI()
+
+# ----------- CORS -----------
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Cambia esto a ["http://localhost:3000"] si quieres restringir
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # --- Configuración MinIO ---
 MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", "localhost")
@@ -33,15 +49,37 @@ minio_client = Minio(
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_INDEX_NAME = "asignaturas"
 
+# ----- UTILIDADES -----
+class FileRequest(BaseModel):
+    filename: str
+
 def ascii_safe_id(text):
     text = unicodedata.normalize('NFKD', text)
     text = text.encode('ascii', 'ignore').decode('ascii')
     return re.sub(r'[^a-zA-Z0-9._-]', '_', text)
 
-def procesar_pdf_service(filename: str):
-    ruta_local = os.path.join("descargas", filename)
+def descargar_y_guardar_archivo(bucket: str, filename: str, ruta_local: str):
+    try:
+        response = minio_client.get_object(bucket, filename)
+        os.makedirs(os.path.dirname(ruta_local), exist_ok=True)
+        with open(ruta_local, "wb") as f:
+            for chunk in response.stream(32 * 1024):
+                f.write(chunk)
+        response.close()
+        response.release_conn()
+    except S3Error as e:
+        raise HTTPException(status_code=500, detail=f"Error al descargar archivo: {e}")
 
-    # --- Descargar archivo desde MinIO ---
+# ----- ENDPOINT UNIFICADO: DESCARGA + PROCESADO + PINECONE -----
+@app.post("/procesar-pdf")
+def procesar_pdf_service(req: FileRequest):
+    filename = req.filename
+
+    # 1. Guardar archivo en disco (para depuración)
+    ruta_local = os.path.join("descargas", filename)
+    descargar_y_guardar_archivo(MINIO_BUCKET_NAME, filename, ruta_local)
+
+    # 2. Descargar archivo en memoria
     try:
         response = minio_client.get_object(MINIO_BUCKET_NAME, filename)
         file_bytes = BytesIO(response.read())
@@ -50,7 +88,7 @@ def procesar_pdf_service(filename: str):
     except S3Error as e:
         raise HTTPException(status_code=404, detail=f"Error al descargar desde MinIO: {e}")
 
-    # --- Extraer texto del PDF ---
+    # 3. Extraer texto del PDF con coordenadas por span (sin dividir más)
     try:
         pdf = fitz.open(stream=file_bytes, filetype="pdf")
         documents = []
@@ -68,19 +106,23 @@ def procesar_pdf_service(filename: str):
                                     metadata={
                                         "page": page_num + 1,
                                         "file": filename,
-                                        "bbox": [str(coord) for coord in span["bbox"]],
-                                    },
+                                        # bbox como lista de strings para no tener problemas en Pinecone
+                                        "bbox": [str(coord) for coord in span["bbox"]]
+                                    }
                                 ))
         pdf.close()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al procesar PDF: {e}")
 
-    # --- Embeddings + Pinecone ---
+    # 4. No dividimos en chunks, usamos cada span como chunk
+    chunks = documents
+
+    # 5. Embeddings + Pinecone
     try:
         embeddings = OpenAIEmbeddings(
             openai_api_key=os.getenv("OPENAI_API_KEY"),
             model="text-embedding-3-small",
-            dimensions=1536,
+            dimensions=1536
         )
         pinecone_client = Pinecone(api_key=PINECONE_API_KEY)
         index = pinecone_client.Index(PINECONE_INDEX_NAME)
@@ -88,7 +130,7 @@ def procesar_pdf_service(filename: str):
         upserts = []
         vector_ids = []
 
-        for i, chunk in enumerate(documents):
+        for i, chunk in enumerate(chunks):
             vector_id = ascii_safe_id(f"{filename}_chunk_{i}")
             vector_ids.append(vector_id)
             embedding = embeddings.embed_query(chunk.page_content)
@@ -98,6 +140,8 @@ def procesar_pdf_service(filename: str):
                 "source": filename,
                 "chunk": i,
                 **chunk.metadata,
+                # bbox sigue siendo lista de strings
+                "bbox": [str(coord) for coord in chunk.metadata.get("bbox", [])]
             }
 
             upserts.append((vector_id, embedding, metadata))
@@ -110,6 +154,7 @@ def procesar_pdf_service(filename: str):
     return {
         "status": "ok",
         "archivo": filename,
+        "archivo_guardado_en": ruta_local,
         "chunks_subidos": len(upserts),
-        "vector_ids": vector_ids[:5],
+        "vector_ids": vector_ids[:5]  # Mostramos solo los primeros 5 IDs como ejemplo
     }
