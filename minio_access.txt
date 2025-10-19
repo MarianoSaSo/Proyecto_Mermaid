@@ -1,0 +1,19 @@
+#1. Create docker conteniner and image:(Comand)
+docker run -d --name minio -p 9000:9000 -p 9001:9001 -e "MINIO_ROOT_USER=admin" -e "MINIO_ROOT_PASSWORD=admin123" -v C:\minio\data:/data quay.io/minio/minio server /data --console-address ":9001"
+
+{Explanation: 
+-d → se ejecuta en segundo plano (background).
+--name minio → nombre del contenedor.
+-p 9000:9000 -p 9001:9001 → expone los puertos.
+-e ... → variables de entorno (usuario/contraseña).
+-v C:\minio\data:/data → monta la carpeta C:\minio\data en el contenedor (persistencia de datos).
+quay.io/minio/minio → imagen oficial.
+server /data --console-address ":9001" → arranca el servidor MinIO con consola en el puerto 9001.
+}
+
+
+#2. Ejecute it
+docker start minio
+
+#3. Stop it 
+docker stop minio

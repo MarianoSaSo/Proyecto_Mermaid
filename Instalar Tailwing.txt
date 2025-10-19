@@ -1,0 +1,6 @@
+#1. Comando para crear el proyecto con React y TypeScript
+npm create vite@latest
+
+#2. Instalar Tailwing y hacer el running
+npm install -D tailwindcss postcss autoprefixer
+npx @tailwindcss/cli
