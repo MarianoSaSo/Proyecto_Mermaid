@@ -20,13 +20,17 @@ export default function UploadForm({ ruta_prefix }: UploadFormProps) {
     }
   };
 
-  const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-
-
+  const [notification, setNotification] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
   const handleUpload = async () => {
     if (!selectedFile) {
-      setNotification({ type: 'error', message: 'No hay archivo seleccionado' });
+      setNotification({
+        type: "error",
+        message: "No hay archivo seleccionado",
+      });
       return;
     }
     setUploading(true);
@@ -35,36 +39,55 @@ export default function UploadForm({ ruta_prefix }: UploadFormProps) {
     formData.append("file", selectedFile);
     formData.append("ruta_prefix", ruta_prefix);
     try {
-      const response = await fetch(`/api/upload`, {
+      const response = await fetch(`http://localhost:3000/api/upload-file`, {
         method: "POST",
         body: formData,
       });
       if (!response.ok) throw new Error("Error al subir el archivo");
       const data = await response.json();
       // Construir el path relativo para FastAPI directamente
-      const relativePath = `${ruta_prefix.replace(/\/$/, '')}/${selectedFile.name}`;
+      const relativePath = `${ruta_prefix.replace(/\/$/, "")}/${
+        selectedFile.name
+      }`;
       setLastRelativePath(relativePath);
       // Llama al endpoint externo FastAPI para procesar el PDF
       try {
-        const fastApiRes = await fetch('http://localhost:8000/upload/procesar-pdf', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ filename: relativePath }),
-        });
+        const fastApiRes = await fetch(
+          "http://localhost:8000/upload/procesar-pdf",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ filename: relativePath }),
+          }
+        );
         let fastApiData = null;
         try {
           fastApiData = await fastApiRes.json();
         } catch (e) {
-          fastApiData = { error: 'Respuesta no es JSON', raw: await fastApiRes.text() };
+          fastApiData = {
+            error: "Respuesta no es JSON",
+            raw: await fastApiRes.text(),
+          };
         }
         if (fastApiRes.ok) {
-          setNotification({ type: 'success', message: 'Archivo subido y procesado correctamente.' });
+          setNotification({
+            type: "success",
+            message: "Archivo subido y procesado correctamente.",
+          });
         } else {
-          setNotification({ type: 'error', message: 'Error al procesar en el backend externo: ' + JSON.stringify(fastApiData) });
+          setNotification({
+            type: "error",
+            message:
+              "Error al procesar en el backend externo: " +
+              JSON.stringify(fastApiData),
+          });
         }
       } catch (error: any) {
-        alert('Error al conectar con el backend externo: ' + (error?.message || JSON.stringify(error)));
-        console.error('Error al conectar con FastAPI:', error);
+        alert(
+          "Error al conectar con el backend externo: " +
+            (error?.message || JSON.stringify(error))
+        );
+        console.error("Error al conectar con FastAPI:", error);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -95,7 +118,7 @@ export default function UploadForm({ ruta_prefix }: UploadFormProps) {
       {selectedFile && <p className="text-gray-700">{selectedFile.name}</p>}
 
       {lastRelativePath && (
-        <div style={{marginBottom: 12, color: 'blue', fontWeight: 'bold'}}>
+        <div style={{ marginBottom: 12, color: "blue", fontWeight: "bold" }}>
           RelativePath calculado: {lastRelativePath}
         </div>
       )}
@@ -114,11 +137,7 @@ export default function UploadForm({ ruta_prefix }: UploadFormProps) {
         >
           ← Volver
         </button>
-
-
       </div>
     </div>
   );
 }
-
-
