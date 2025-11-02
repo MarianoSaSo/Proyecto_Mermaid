@@ -38,7 +38,7 @@ export function getMenuList(pathname: string): Group[] {
       groupLabel: "",
       menus: [
         {
-          href: "/",
+          href: "/Home",
           label: "Inicio",
           icon: LayoutGrid,
           submenus: []
