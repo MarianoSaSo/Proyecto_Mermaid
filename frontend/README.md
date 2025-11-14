@@ -71,3 +71,4 @@ export default defineConfig([
   },
 ])
 ```
+_Added by Romy — testing collaboration setup._.
