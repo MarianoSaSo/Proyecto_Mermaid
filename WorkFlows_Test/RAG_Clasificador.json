@@ -1,0 +1,287 @@
+{
+  "name": "RAG_Clasificador",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -752,
+        -48
+      ],
+      "id": "3b868240-6861-46de-b4a4-d64f392a2d67",
+      "name": "When chat message received",
+      "webhookId": "3dab1007-5c1f-492c-9ae3-dad0eb38701a"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "Eres un Agente especializado en redactar y preparar emails para enviar.\nTu función es conversar con el usuario de manera guiada para obtener la información necesaria y, una vez reunida, generar un email completo, bien escrito y listo para enviar.\n\nComportamiento del agente:\n\nPreséntate siempre al inicio como:\n“Hola, soy tu Agente de Envío de Emails. Estoy aquí para ayudarte a redactar el correo perfecto.”\n\n\nPrimero, solicita la dirección de correo electrónico del destinatario.\nSi el usuario no la proporciona, vuelve a pedirla de forma amable.\n\nCuando tengas la dirección, solicita el contenido del email que desea enviar el usuario.\nPuede ser un mensaje breve, ideas sueltas o instrucciones; tú transformarás esa información en un email profesional.\n\nCuando ya tengas:\n\nla dirección de correo\n\ny el contenido del mensaje\n\nEntonces redactarás un email completo, con buena estructura y formato claro.\n\nAntes de enviarlo tienes que mostrarle la version del email que has redactado y esperar a que el usuario te confirme o te diga si es necesario cambiar algo\n\nReglas al redactar el email final:\n\nUsa párrafos separados, nunca un bloque de texto seguido.\n\nIncluye:\n\nSaludo\n\nIntroducción breve\n\nDesarrollo principal\n\nCierre profesional y amable\n\nAjusta el tono al estilo del usuario (formal, informal, técnico, amistoso…).\n\nNo incluyas explicaciones sobre tu proceso, solo entrega el email listo.\n\nNo inventes datos que el usuario no haya proporcionado.\n\nEjemplo de email del estilo esperado (NO lo copies literalmente):\n\nHola Laura,\n\nEspero que estés muy bien. Te escribo para darte la información que comentaste en nuestra conversación anterior. He preparado los detalles para que puedas revisarlos con calma cuando tengas tiempo.\n\nSi necesitas que añada más datos o deseas realizar algún ajuste, estaré encantado de ayudarte.\n\nUn saludo cordial,\nTu asistente"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -128,
+        160
+      ],
+      "id": "81b54edf-f966-493f-87d6-b4c30548929b",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -176,
+        -128
+      ],
+      "id": "bf69e454-c745-4010-8809-8e15cd6417d8",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "FlqQoRxIgWMcrV57",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        -48,
+        384
+      ],
+      "id": "3468486b-c266-4e3e-8674-e5bb3c4d2aab",
+      "name": "Gmail",
+      "webhookId": "59b1b77a-c9ae-4e1c-8ab4-a633602c0496",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "N1z1pkS7BLpMT2xW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('When chat message received').item.json.sessionId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -48,
+        -128
+      ],
+      "id": "f9c197da-1c27-4c0f-a9bf-ba425ff46af2",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.chatInput }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Consulta"
+            },
+            {
+              "category": "Send_Email",
+              "description": "Encargado de enviar emails si lo requiere el usuario"
+            }
+          ]
+        },
+        "options": {
+          "fallback": "other"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        -528,
+        -48
+      ],
+      "id": "d1d2073e-e6a0-43c8-972f-eaf97d7e01c8",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Eres un agente encargado de proporcionar información al usuario sobre los productos. Debes usar la herramienta Productos para consultar la información"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -128,
+        -352
+      ],
+      "id": "e9b680c4-0fb9-4496-b8f2-e94a4236ae2d",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1sqwMC2j-SZ-93MV9oXtR5_TF3uMNAsGmKSmigwSA9hE",
+          "mode": "list",
+          "cachedResultName": "Productos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sqwMC2j-SZ-93MV9oXtR5_TF3uMNAsGmKSmigwSA9hE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1180610768,
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sqwMC2j-SZ-93MV9oXtR5_TF3uMNAsGmKSmigwSA9hE/edit#gid=1180610768"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        80,
+        -128
+      ],
+      "id": "6b93f576-f210-4309-9bc8-000ee9ae478a",
+      "name": "Productos",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "uXRzhRvlelOW6Luv",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Productos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0c2b68fd-f8e3-417f-b489-2ba919f07d7c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "270d7de402522376d919cc839010a9ff4ff124d265120378ad91954c359f5497"
+  },
+  "id": "IUZi1JYtjEQR0UC0",
+  "tags": []
+}

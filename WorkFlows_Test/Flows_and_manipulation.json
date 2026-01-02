@@ -1,0 +1,590 @@
+{
+  "name": "Flows_and_manipulation",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -976,
+        -64
+      ],
+      "id": "5ad4005d-68b2-45a3-adb2-9baf4913eca8",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1sqwMC2j-SZ-93MV9oXtR5_TF3uMNAsGmKSmigwSA9hE",
+          "mode": "list",
+          "cachedResultName": "Productos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sqwMC2j-SZ-93MV9oXtR5_TF3uMNAsGmKSmigwSA9hE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1180610768,
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sqwMC2j-SZ-93MV9oXtR5_TF3uMNAsGmKSmigwSA9hE/edit#gid=1180610768"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -800,
+        -64
+      ],
+      "id": "3c4a0860-b8bb-4211-bd45-db86f2b0d236",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q1fI1ifbrdVgFTRm",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "379454cf-6cf4-43b1-975d-b4ef70bf18c0",
+              "name": "producto",
+              "value": "={{ $json.Nombre.replaceAll(\" \",\"_\") }}",
+              "type": "string"
+            },
+            {
+              "id": "e65f949c-2eda-4cba-8800-9c58163803d2",
+              "name": "precio",
+              "value": "={{ $json['Precio Unitario (USD)'] }}",
+              "type": "number"
+            },
+            {
+              "id": "61987d88-35b7-4610-88d6-f0509157260d",
+              "name": "stock",
+              "value": "={{ $json['Cantidad Disponible'] }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        48,
+        -64
+      ],
+      "id": "98167226-f5ff-41a0-8b35-438cfd0eb2c6",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "content": "Como vemos aqui lo que hace es tomar todos los elementos con todas los atributos\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -848,
+        -208
+      ],
+      "id": "b14eeccc-ad66-47d2-a5d0-e7f0b5b1d7c7",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Pero vamos a imaginar que solo queremos tomar el nombre y precio de los productos, para eso usamos set. Tambien podemos modificar el tipo de dato\n",
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        -176
+      ],
+      "id": "709d5b76-8a1d-4d3f-aed1-7e94259565e4",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "En expresion podemos usar tambien codigo javaScript. En este codigo por ejemplo hemos reemplazado los espacios por guiones bajos.",
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        64
+      ],
+      "id": "70957edc-449a-46ab-b1d1-a508ec58f6b7",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "944cea49-fd4c-46b5-9bcd-bb21dae25a76",
+              "leftValue": "={{ $json.precio }}",
+              "rightValue": 30,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "25854069-16e1-4081-9fff-e4c80690eff2",
+              "leftValue": "={{ $json.stock }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        768,
+        -64
+      ],
+      "id": "2dac9e7c-e0f8-4b57-88b7-012db3a5dd34",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "content": "Es un filtro que bajo una condicion simplemente filtrara. Por ejemplo precio mas de 30 euros y que haya en stock"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        688,
+        -176
+      ],
+      "id": "64f6ecdc-d28e-4144-866f-f014ffc5aa81",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "maxItems": 10
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -64
+      ],
+      "id": "4df3969d-b874-48db-a6f3-f683d49c1c82",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "content": "Esto es para limitar el numero de items de salida. Imaginemos que solo queremos 10. Podemos seleccionar si queremos los primeros o los ultimos",
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        368,
+        -176
+      ],
+      "id": "8ac9c52e-74cb-4b0b-ac44-8a11f8c6be60",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        432,
+        176
+      ],
+      "id": "04483dc5-ef58-45cc-b630-2c2c1c3189cd",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "content": "Nodo para eliminar duplicados",
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        352,
+        96
+      ],
+      "id": "44047a03-3114-4e6f-8c49-3538033a0102",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "lista_productos",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        432,
+        464
+      ],
+      "id": "40a28fbb-b258-4ab1-9920-6967cc9a3467",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "content": "Ahora imaginemos que queremos tener todos los elementos tratados en uno por igual, es decir que se agreguen en un solo elemento, es decir, un array.",
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        352,
+        336
+      ],
+      "id": "726ff19c-3af0-4954-8ae2-93b012046631",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "Hace lo contrario"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        640,
+        336
+      ],
+      "id": "fbf06f0f-2e5d-460e-ae36-1da35cf18cf1",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "lista_productos",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        704,
+        464
+      ],
+      "id": "3fbbf7db-c882-4412-866c-693b02451583",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1232,
+        192
+      ],
+      "id": "c217b554-72c0-417c-93b7-bff1bcb01bf4",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "content": "Lo que hace este nodo es juntar el resultado de distintas salidas",
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        128
+      ],
+      "id": "e9ce311a-dc60-4696-9cb8-85b85e3ce059",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        208
+      ],
+      "id": "6564bc92-8628-465a-a405-fe58be0b80ee",
+      "name": "Remove Duplicates1"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "field": "precio"
+            },
+            {
+              "aggregation": "max",
+              "field": "precio"
+            },
+            {
+              "aggregation": "min",
+              "field": "precio"
+            },
+            {
+              "aggregation": "average",
+              "field": "precio"
+            },
+            {
+              "aggregation": "sum",
+              "field": "precio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        1840,
+        208
+      ],
+      "id": "7c10af60-c436-4c81-9c6d-e33e0697e082",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "content": "Permite realizar operaciones de agregacion\nPor ejemplo: el maximo , el minimo, la media,..."
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        96
+      ],
+      "id": "7f9e362f-a550-4a36-a1bc-4df3c0f06bf4",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -576,
+        160
+      ],
+      "id": "7dd65aac-bf95-4d13-b7d2-bb16da7e28e8",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f32d5d85-20fc-444f-8b01-c82b7c3b1f04",
+              "name": "Precio Doble",
+              "value": "={{ $json['Precio Unitario (USD)'] * 2 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -368,
+        256
+      ],
+      "id": "75a9c7b7-ffc7-4c19-894b-f176f09ea1c2",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "content": "Aqui lo que hacemos es anadir un loop para que pase uno por uno por los items y multiplique por dos su precio."
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -896,
+        272
+      ],
+      "id": "2658f616-b37d-4ce5-b1b0-7e08acb6ba23",
+      "name": "Sticky Note10"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates1": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "275e4e08-e0f9-4da2-a42e-4b3ba551fa9f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "50e908245cf6cca64bb82f82936896e49b0c1624b5b3352ac4dfa73bc56481dc"
+  },
+  "id": "n1UhG7bqkN7fjYX3",
+  "tags": []
+}

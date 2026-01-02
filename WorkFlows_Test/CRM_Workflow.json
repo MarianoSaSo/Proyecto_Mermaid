@@ -1,0 +1,408 @@
+{
+  "name": "CRM_Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Formulario Contacto",
+        "formDescription": "Formulario para tomar los datos del usuario",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "placeholder": "Write your name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Surname",
+              "placeholder": "Write your surname...",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "email",
+              "fieldType": "email",
+              "placeholder": "Write your email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Service",
+              "fieldType": "radio",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Code app - 2000$"
+                  },
+                  {
+                    "option": "Consulting meeting - 50$"
+                  },
+                  {
+                    "option": "Format computer - 100$"
+                  },
+                  {}
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Phone number",
+              "placeholder": "Write your number and prefix (example +34) ..."
+            },
+            {
+              "fieldLabel": "Consulta",
+              "fieldType": "textarea",
+              "placeholder": "Escribe tu consulta..."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -560,
+        -32
+      ],
+      "id": "c67c55ad-55a0-416f-9374-8fa0066c4aa1",
+      "name": "On form submission",
+      "webhookId": "a1f35576-67d6-49f7-950f-f25cde69561b"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.Service }}",
+                    "rightValue": "=Code app - 2000$",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ecb2a6e0-5941-4a38-8ac5-f9c1eafcc676"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Code app"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7f8d93c7-853c-48f5-a85a-f00e203dc1f7",
+                    "leftValue": "={{ $json.Service }}",
+                    "rightValue": "Consulting meeting - 50$",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Consulting"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "665e7bc4-026f-41f8-b800-9bc76d11fbb6",
+                    "leftValue": "={{ $json.Service }}",
+                    "rightValue": "Format computer - 100$",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Format"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -80,
+        -64
+      ],
+      "id": "a52a8ae9-a06d-4a2f-96ca-204694b06a20",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.email }}",
+        "subject": "=Peticion de servicio:  {{ $('On form submission').item.json.Service }}",
+        "message": "=Hola  {{ $('On form submission').item.json.Name }}. Hemos recibido tu solicitud para el servicio: {{ $('On form submission').item.json.Service }}.\n\nNos pondremos en contacto pronto a tu numero de telefono {{ $('On form submission').item.json['Phone number'] }}\nGracias por confiar en nosotros. \n\nUn saludo y nos vemos pronto",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        336,
+        -320
+      ],
+      "id": "d9df8211-dcf0-49c8-8b1b-1a3d5221cc23",
+      "name": "Send a message",
+      "webhookId": "5da51686-e6a9-4c6b-8b42-9b49f980dff7",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "D4cEbuX1DCtVGiuy",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.email }}",
+        "subject": "=Peticion de servicio:  {{ $('On form submission').item.json.Service }}",
+        "message": "=Hola  {{ $('On form submission').item.json.Name }}. Hemos recibido tu solicitud para el servicio: {{ $('On form submission').item.json.Service }}.\n\nNos pondremos en contacto pronto a tu numero de telefono {{ $('On form submission').item.json['Phone number'] }}\nGracias por confiar en nosotros. \n\nUn saludo y nos vemos pronto",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        336,
+        -128
+      ],
+      "id": "59f5e62a-6cda-4b14-9f98-2a4f2385738e",
+      "name": "Send a message1",
+      "webhookId": "5da51686-e6a9-4c6b-8b42-9b49f980dff7",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "D4cEbuX1DCtVGiuy",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.email }}",
+        "subject": "=Peticion de servicio:  {{ $('On form submission').item.json.Service }}",
+        "message": "=Hola  {{ $('On form submission').item.json.Name }}. Hemos recibido tu solicitud para el servicio: {{ $('On form submission').item.json.Service }}.\n\nNos pondremos en contacto pronto a tu numero de telefono {{ $('On form submission').item.json['Phone number'] }}\nGracias por confiar en nosotros. \n\nUn saludo y nos vemos pronto",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        352,
+        64
+      ],
+      "id": "ed0b9a6c-4f21-4b00-9544-d836175ddfb2",
+      "name": "Send a message2",
+      "webhookId": "5da51686-e6a9-4c6b-8b42-9b49f980dff7",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "D4cEbuX1DCtVGiuy",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appWPzYGS9AVbOvvH",
+          "mode": "list",
+          "cachedResultName": "Users",
+          "cachedResultUrl": "https://airtable.com/appWPzYGS9AVbOvvH"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblm7VmG1hxt9x2Pg",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appWPzYGS9AVbOvvH/tblm7VmG1hxt9x2Pg"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.Name }}",
+            "Surname": "={{ $json.Surname }}",
+            "email": "={{ $json.email }}",
+            "service": "={{ $json.Service }}",
+            "phone": "={{ $json['Phone number'] }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Surname",
+              "displayName": "Surname",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "service",
+              "displayName": "service",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -320,
+        -32
+      ],
+      "id": "746fd1c4-6432-4e63-a0fb-1d0578865839",
+      "name": "Create or update a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "r7T3JZzPuNnmyhxY",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Create or update a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Create or update a record": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9aa1148e-0b22-43fe-84e2-6f8e2122540b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "50e908245cf6cca64bb82f82936896e49b0c1624b5b3352ac4dfa73bc56481dc"
+  },
+  "id": "alWqJ5Zkmb0RbKjw",
+  "tags": []
+}

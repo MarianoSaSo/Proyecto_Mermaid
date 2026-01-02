@@ -1,0 +1,232 @@
+{
+  "name": "IF_SWITCH",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        0
+      ],
+      "id": "7169d5f9-362c-448f-b653-bd43df03a25f",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.isElectric }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "3b6666f1-1321-4151-b173-98df9f4503a0"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "isElectric"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c007c87c-03bc-4181-85f1-7143f34a9ca0",
+                    "leftValue": "={{ $json.available }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "available"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        528,
+        -80
+      ],
+      "id": "2fae9bcd-9d27-4cf5-b9d4-d0932f6fda3a",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b2a95b24-0191-4f39-99d8-bc4b242a048b",
+              "leftValue": "={{ $json.year }}",
+              "rightValue": 2020,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        96,
+        0
+      ],
+      "id": "c2b22656-0622-421f-8d64-7c4c594b78ae",
+      "name": "If"
+    }
+  ],
+  "pinData": {
+    "When clicking ‘Execute workflow’": [
+      {
+        "json": {
+          "brand": "Toyota",
+          "model": "Corolla",
+          "year": 2020,
+          "engine": "1.8 Hybrid",
+          "features": [
+            "Bluetooth",
+            "Rear Camera",
+            "Cruise Control"
+          ],
+          "isElectric": false,
+          "available": true,
+          "id": 1
+        }
+      },
+      {
+        "json": {
+          "brand": "BMW",
+          "model": "M3",
+          "year": 2023,
+          "engine": "3.0 Twin-Turbo",
+          "features": [
+            "Sport Mode",
+            "Leather Seats",
+            "Parking Sensors"
+          ],
+          "isElectric": false,
+          "available": false,
+          "id": 2
+        }
+      },
+      {
+        "json": {
+          "brand": "Ford",
+          "model": "Mustang",
+          "year": 2018,
+          "engine": "5.0 V8",
+          "features": [
+            "Launch Control",
+            "Premium Audio"
+          ],
+          "isElectric": false,
+          "available": true,
+          "id": 3
+        }
+      },
+      {
+        "json": {
+          "brand": "Tesla",
+          "model": "Model 3",
+          "year": 2022,
+          "engine": "Electric Long Range",
+          "features": [
+            "Autopilot",
+            "Wireless Charging",
+            "Heated Seats"
+          ],
+          "isElectric": true,
+          "available": true,
+          "id": 4
+        }
+      },
+      {
+        "json": {
+          "brand": "Honda",
+          "model": "Civic",
+          "year": 2019,
+          "engine": "1.5 Turbo",
+          "features": [
+            "Android Auto",
+            "Eco Mode"
+          ],
+          "isElectric": false,
+          "available": false,
+          "id": 5
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "dbb97a3d-6f29-4580-95eb-c878f3825ff0",
+  "meta": {
+    "instanceId": "270d7de402522376d919cc839010a9ff4ff124d265120378ad91954c359f5497"
+  },
+  "id": "GFLsnkUljmT1WK4d",
+  "tags": []
+}

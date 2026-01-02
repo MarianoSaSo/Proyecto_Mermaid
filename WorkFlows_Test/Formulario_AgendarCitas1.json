@@ -1,0 +1,372 @@
+{
+  "name": "Formulario_AgendarCitas1",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Personal Data",
+        "formDescription": "Formulario para obtener los datos del cliente y poder enviar un email personalizado a su correo electronico",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Nombre",
+              "placeholder": "Escribe tu nombre...",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Apellidos",
+              "placeholder": "Escribe tus apellidos...",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Posición ",
+              "placeholder": "Escribe tu posición  en la empresa...",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "placeholder": "Escribe tu email...",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Asunto",
+              "placeholder": "Escribe en que podemos ayudarte",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -368,
+        -64
+      ],
+      "id": "e9628aab-65e8-4a2f-94b0-3c9364b5e96b",
+      "name": "On form submission",
+      "webhookId": "2d05a637-65e7-4b8d-8d0d-c2042f5eddb2"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=Eres un asistente experto en Pokémon encargado de redactar emails personalizados para clientes. Debes crear un correo utilizando la información que te proporciono y respondiendo a las preguntas o temas que aparecen en {{ $json.Asunto }}.\n\nAdemas al final se le dara la posibilidad de agendar una cita con uno de nuestros agentes por si tiene dudas y quiere tener una cita. tiene que mantener siempre esta direccion https://cal.com/mariano-saso-z2bmxz/30min?overlayCalendar=true\n\nDatos del cliente:\n\nNombre: {{ $json.Nombre }}\n\nApellidos: {{ $json.Apellidos }}\n\nPosición: {{ $json['Posición '] }}\n\nInstrucciones para el email:\n\nCrea un email bien formateado, con párrafos claros y separados. No escribas todo en un solo bloque de texto.\n\nHaz que el email sea personalizado, considerando la posición del cliente y sus intereses.\n\nMantén un tono amistoso y profesional, incorporando referencias o guiños al mundo Pokémon cuando sea apropiado.\n\nResponde de manera clara y completa a la información o preguntas de {{ $json.Asunto }}.\n\nInspírate en el siguiente ejemplo, pero no lo copies literalmente:\n\nEjemplo de email formateado:\n\n\nCuerpo del email:\n\nHola Ash,\n\nEspero que estés teniendo un gran día como Líder de Entrenadores.\n\nHe revisado tu consulta sobre cómo mejorar tu equipo Pokémon y creo que podemos enfocarnos en fortalecer a tus Pokémon de tipo Agua, que complementan muy bien a tus líderes actuales.\n\nAdemás, te sugiero entrenar más a tus Pokémon de tipo Eléctrico para equilibrar tu equipo frente a rivales de tipo Agua. Recuerda que la estrategia y la paciencia son clave, ¡y con tu experiencia seguro lograrás grandes resultados!\n\nSi quieres, puedo enviarte una guía más detallada con consejos avanzados para tu equipo.\n\nAgenda en el siguiente enlace: https://cal.com/mariano-saso-z2bmxz/30min?overlayCalendar=true\n\n¡Saludos cordiales y que tengas un día lleno de aventuras Pokémon!\n— Equipo Pokémon Pro\n\nNota para el modelo:\n\nAsegúrate de usar párrafos separados para cada idea principal.\n\nMantén los saludos y cierres en líneas separadas.\n\nIncluye referencias a Pokémon de manera natural y relacionada con la posición del cliente."
+            },
+            {
+              "content": "=Eres un asistente experto en Pokémon encargado de redactar emails personalizados para clientes. Debes crear un correo utilizando la información que te proporciono y respondiendo a las preguntas o temas que aparecen en {{ $json.Asunto }}.\n\nDatos del cliente:\n\nNombre: {{ $json.Nombre }}\n\nApellidos: {{ $json.Apellidos }}\n\nPosición: {{ $json['Posición '] }}\n\nInstrucciones para el email:\n\nEl email debe ser personalizado y hacer que el cliente se sienta identificado, especialmente considerando su posición.\n\nUsa un tono amistoso y profesional, incorporando referencias o guiños al mundo Pokémon cuando sea apropiado.\n\nResponde a la información o preguntas de {{ $json.Asunto }} de manera clara y completa.\n\nInspírate en el siguiente ejemplo, pero no lo copies literalmente:\n\nEjemplo de email:\n\n\nCuerpo del email:\nHola Ash,\n\nEspero que estés teniendo un gran día como Líder de Entrenadores. He revisado tu consulta sobre cómo mejorar tu equipo Pokémon y creo que podemos enfocarnos en fortalecer a tus Pokémon de tipo Agua, que complementan muy bien a tus líderes actuales.\n\nAdemás, te sugiero entrenar más a tus Pokémon de tipo Eléctrico para equilibrar tu equipo frente a rivales de tipo Agua. Recuerda que la estrategia y la paciencia son clave, ¡y con tu experiencia seguro lograrás grandes resultados!\n\nSi quieres, puedo enviarte una guía más detallada con consejos avanzados para tu equipo.\n\n¡Saludos cordiales y que tengas un día lleno de aventuras Pokémon!\n— Equipo Pokémon Pro"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        -64,
+        -64
+      ],
+      "id": "cf884237-20c8-43e7-90da-36cfb1c0a79a",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "FlqQoRxIgWMcrV57",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "=mariano.saezsoriano@gmail.com {{ $('On form submission').item.json.Email }}",
+        "subject": "Prueba Email",
+        "emailType": "text",
+        "message": "=email {{ $json.output[0].content[0].text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        672,
+        -64
+      ],
+      "id": "edb188f8-5922-4fb2-9f54-491f48364bda",
+      "name": "Send a message",
+      "webhookId": "fe8b4cd2-9b0d-437b-afea-a134db519a32",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "N1z1pkS7BLpMT2xW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "events": [
+          "BOOKING_CREATED"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.calTrigger",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        160
+      ],
+      "id": "20aa9655-f819-43f8-a791-da2530edd8b9",
+      "name": "Cal.com Trigger",
+      "webhookId": "86a02710-540b-479b-8344-e00fc8655fc4",
+      "credentials": {
+        "calApi": {
+          "id": "VG4hB3o1ewri2LZr",
+          "name": "Cal account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.organizer.email }}",
+        "subject": "Confirmación cita",
+        "message": "=Hola  {{ $json.organizer.name }}, \n<br><br>\nTe enviamos este correo para confirmate tu cita con nosotros en {{ $json.startTime.toDateTime().format('yyyy-MM-dd') }}\n<br><br>\nUn saludo y nos vemos pronto\n<br><br>\nAsh CEO. Pokemon Solutions",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -160,
+        160
+      ],
+      "id": "232deacf-8e03-4602-a555-00b949010cf9",
+      "name": "Send a message1",
+      "webhookId": "45ca99f6-3387-4e96-b372-f5acf941f2d8",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "N1z1pkS7BLpMT2xW",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "Nombre": "Mariano",
+          "Apellidos": "Sáez Soriano",
+          "Posición ": "WebDeveloper",
+          "Email": "mariano.saezsoriano@gmail.com",
+          "Asunto": "Necesito iformacion sobre el pokemon pikachu",
+          "submittedAt": "2025-11-16T15:23:39.250+01:00",
+          "formMode": "test"
+        }
+      }
+    ],
+    "Cal.com Trigger": [
+      {
+        "json": {
+          "triggerEvent": "BOOKING_CREATED",
+          "createdAt": "2025-11-16T15:03:35.356Z",
+          "bookerUrl": "https://cal.com",
+          "title": "Reunión de 30 min between Mariano SaSo and Mariano SaSo",
+          "startTime": "2025-11-17T08:30:00Z",
+          "endTime": "2025-11-17T09:00:00Z",
+          "additionalNotes": "",
+          "type": "30min",
+          "description": "",
+          "eventTypeId": 3919976,
+          "hideCalendarNotes": false,
+          "hideCalendarEventDetails": false,
+          "hideOrganizerEmail": false,
+          "schedulingType": null,
+          "seatsPerTimeSlot": null,
+          "seatsShowAttendees": true,
+          "seatsShowAvailabilityCount": true,
+          "customReplyToEmail": null,
+          "disableRescheduling": false,
+          "disableCancelling": false,
+          "organizer": {
+            "id": 1923493,
+            "name": "Mariano SaSo",
+            "email": "mariano.saezsoriano@gmail.com",
+            "username": "mariano-saso-z2bmxz",
+            "timeZone": "Europe/Paris",
+            "language": {
+              "locale": "en"
+            },
+            "timeFormat": "h:mma",
+            "utcOffset": 60
+          },
+          "attendees": [
+            {
+              "email": "mariano.saezsoriano@gmail.com",
+              "name": "Mariano SaSo",
+              "firstName": "",
+              "lastName": "",
+              "timeZone": "Europe/Paris",
+              "language": {
+                "locale": "es"
+              },
+              "utcOffset": 60
+            }
+          ],
+          "customInputs": {},
+          "responses": {
+            "name": {
+              "label": "your_name",
+              "value": "Mariano SaSo",
+              "isHidden": false
+            },
+            "email": {
+              "label": "email_address",
+              "value": "mariano.saezsoriano@gmail.com",
+              "isHidden": false
+            },
+            "attendeePhoneNumber": {
+              "label": "phone_number",
+              "isHidden": true
+            },
+            "location": {
+              "label": "location",
+              "value": {
+                "optionValue": "",
+                "value": "integrations:daily"
+              },
+              "isHidden": false
+            },
+            "title": {
+              "label": "what_is_this_meeting_about",
+              "isHidden": true
+            },
+            "notes": {
+              "label": "additional_notes",
+              "isHidden": false
+            },
+            "guests": {
+              "label": "additional_guests",
+              "value": [],
+              "isHidden": false
+            },
+            "rescheduleReason": {
+              "label": "reason_for_reschedule",
+              "isHidden": false
+            }
+          },
+          "userFieldsResponses": {},
+          "location": "integrations:daily",
+          "destinationCalendar": [
+            {
+              "id": 960200,
+              "integration": "google_calendar",
+              "externalId": "mariano.saezsoriano@gmail.com",
+              "primaryEmail": "mariano.saezsoriano@gmail.com",
+              "userId": 1923493,
+              "eventTypeId": null,
+              "credentialId": 1526010,
+              "createdAt": "2025-11-16T14:37:17.083Z",
+              "updatedAt": "2025-11-16T14:37:17.083Z",
+              "delegationCredentialId": null,
+              "domainWideDelegationCredentialId": null
+            }
+          ],
+          "iCalUID": "mDkDZzhTGGYdwNErYoixzo@Cal.com",
+          "iCalSequence": 0,
+          "requiresConfirmation": false,
+          "oneTimePassword": null,
+          "uid": "mDkDZzhTGGYdwNErYoixzo",
+          "conferenceData": {
+            "createRequest": {
+              "requestId": "2db644eb-37a5-581a-99fa-ebe6ce513834"
+            }
+          },
+          "videoCallData": {
+            "type": "daily_video",
+            "id": "3AR8VluvvTzs8kIQK6gV",
+            "password": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyIjoiM0FSOFZsdXZ2VHpzOGtJUUs2Z1YiLCJleHAiOjE3NjQ1Nzk2MDAsIm8iOnRydWUsImVydWkiOmZhbHNlLCJkIjoiYmJkOThhNzEtMTljOS00YmIxLWE1YzUtY2FmMWVjNWJkMTA1IiwiaWF0IjoxNzYzMzA1NDE0fQ.jttccbrwHGhAv3MO01zQlKARdvNkzimbmUy0NsXYfHI",
+            "url": "https://meetco.daily.co/3AR8VluvvTzs8kIQK6gV"
+          },
+          "appsStatus": [
+            {
+              "appName": "daily-video",
+              "type": "daily_video",
+              "success": 1,
+              "failures": 0,
+              "errors": []
+            },
+            {
+              "appName": "google-calendar",
+              "type": "google_calendar",
+              "success": 1,
+              "failures": 0,
+              "errors": [],
+              "warnings": []
+            }
+          ],
+          "eventTitle": "Reunión de 30 min",
+          "eventDescription": null,
+          "price": 0,
+          "currency": "usd",
+          "length": 30,
+          "bookingId": 12820197,
+          "metadata": {
+            "videoCallUrl": "https://app.cal.com/video/mDkDZzhTGGYdwNErYoixzo"
+          },
+          "status": "ACCEPTED"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cal.com Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "99482c83-b27f-4f83-8d12-77b27087f322",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "270d7de402522376d919cc839010a9ff4ff124d265120378ad91954c359f5497"
+  },
+  "id": "9tzEZgYwyrXVdWh5",
+  "tags": []
+}

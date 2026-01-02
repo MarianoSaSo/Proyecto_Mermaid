@@ -1,0 +1,362 @@
+{
+  "name": "email_clasif.",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -256,
+        -64
+      ],
+      "id": "11e6f045-1c05-46d8-8e47-939d8f5bcca0",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "D4cEbuX1DCtVGiuy",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "=Aqui te envio el email que tienes que clasificar\nAsunto:  {{ $json.Subject }}\nContenido del mensaje: {{ $json.snippet }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Solicitar Informacion",
+              "description": "El cliente solicita informacion sobre los servicios de la empresa"
+            },
+            {
+              "category": "Agendar Reuncion",
+              "description": "El cliente solicita la posibilidad de agendar una reucion para automatizar un proceso en su empresa"
+            }
+          ]
+        },
+        "options": {
+          "fallback": "other"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        -80
+      ],
+      "id": "82af911c-50a7-4225-b3a8-bf4a5f6d55c2",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        160
+      ],
+      "id": "45975452-87dc-490e-8b97-f04bc2af1068",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "n0wfPgDwiY0nvtW8",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "labelIds": [
+          "Label_6951792443705441124"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        672,
+        -208
+      ],
+      "id": "73cf1621-9ffe-4f25-9de2-62aeefa7c418",
+      "name": "Add label to message",
+      "webhookId": "86382f28-5abf-4df9-9522-5f6c5996b612",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "D4cEbuX1DCtVGiuy",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        496,
+        -208
+      ],
+      "id": "db220340-9056-4a88-8663-93e6290c938c",
+      "name": "Mark a message as read",
+      "webhookId": "1d14ca7c-2304-4526-840a-55907c9998a0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "D4cEbuX1DCtVGiuy",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "labelIds": [
+          "Label_6951792443705441124"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        672,
+        -32
+      ],
+      "id": "7dad9d29-dd18-4d32-9c4a-d2ca73495214",
+      "name": "Add label to message1",
+      "webhookId": "86382f28-5abf-4df9-9522-5f6c5996b612",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "D4cEbuX1DCtVGiuy",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        496,
+        -32
+      ],
+      "id": "82a64c8d-a27b-4882-9c6b-a034a98e6a5a",
+      "name": "Mark a message as read1",
+      "webhookId": "1d14ca7c-2304-4526-840a-55907c9998a0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "D4cEbuX1DCtVGiuy",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Podemos clasificar cada salida en una etiqueta e ir organizandolos automaticamente. En este caso hemos puesto el mismo ",
+        "width": 400,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        -336
+      ],
+      "id": "75a620a7-aa89-4d8f-afd9-b2eb8efcce26",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "inputText": "=Aqui te envio el email que tienes que analizar\nAsunto:  {{ $json.Subject }}\nContenido del mensaje: {{ $json.snippet }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.sentimentAnalysis",
+      "typeVersion": 1.1,
+      "position": [
+        144,
+        -576
+      ],
+      "id": "7b6b4cc5-f689-4c86-8dcd-f697a08b0c0c",
+      "name": "Sentiment Analysis"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        16,
+        -304
+      ],
+      "id": "90b05419-63a8-49f2-a22a-d54742d398ac",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "n0wfPgDwiY0nvtW8",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Esto podria ser interesante porque si detectamos que el cliente esta mal, trsite o enfadado podriamos referirlo a un soporte mas personal . Podriamos hacer que se nos envie un email para ponernos en contacto con el",
+        "width": 368,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        80,
+        -720
+      ],
+      "id": "ff22a753-3ceb-490f-970a-5955a59c5af5",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {
+    "Gmail Trigger": [
+      {
+        "json": {
+          "id": "19afd49243de9c62",
+          "threadId": "19afd49243de9c62",
+          "snippet": "Buenos dias, solicito informacion para conocer los servicios que ofreceis a la hora de automatizar facturas. Un saludo Juan Bernabeu",
+          "payload": {
+            "mimeType": "multipart/alternative"
+          },
+          "sizeEstimate": 6119,
+          "historyId": "5652984",
+          "internalDate": "1765186009000",
+          "labels": [
+            {
+              "id": "INBOX",
+              "name": "INBOX"
+            },
+            {
+              "id": "UNREAD",
+              "name": "UNREAD"
+            }
+          ],
+          "From": "Mariano Saez <mariano.saesor@gmail.com>",
+          "Subject": "Informacion automatizaciones",
+          "To": "mariano.saezsoriano@gmail.com"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "Mark a message as read",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark a message as read1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark a message as read": {
+      "main": [
+        [
+          {
+            "node": "Add label to message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark a message as read1": {
+      "main": [
+        [
+          {
+            "node": "Add label to message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4175764d-fc56-4ec1-a792-312655969efa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "50e908245cf6cca64bb82f82936896e49b0c1624b5b3352ac4dfa73bc56481dc"
+  },
+  "id": "9rfQDAPnBk5iS3tJ",
+  "tags": []
+}

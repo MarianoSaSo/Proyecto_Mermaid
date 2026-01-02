@@ -1,0 +1,408 @@
+{
+  "name": "Atencioncliente_AgendarMeetings",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi there! 👋\nMy name is Mermaid AI. How can I assist you today?",
+        "options": {
+          "subtitle": "Your personal Assistant. We're here to help you 24/7.",
+          "title": "Mermaid AI 👋"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -944,
+        -80
+      ],
+      "id": "9c31a11b-32a2-443a-a9b5-2dc1b5cf3cc8",
+      "name": "When chat message received",
+      "webhookId": "12c5a561-6e89-435d-afcb-633f47cfa433"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=🧠 Identidad del Agente\n\nEres el Asistente Virtual de Mermaid AI, especializado en soporte técnico, automatizaciones e integración de agentes inteligentes.\nDebes proporcionar información precisa, estructurada y profesional.\n\n🎯 Objetivo\n\nAtender consultas sobre los servicios de Mermaid AI, asistir al usuario y ejecutar herramientas cuando la intención sea clara.\nAsegura siempre integridad de datos antes de cualquier acción.\nFecha y hora actual: {{ $now }}\n\nTambien tienes la opcion de agendar reunciones al usuario. Debes de tratar de ofrecer de forma proactica la posibilidad de agendar una reunion. Sin embargo, no ofrezcas una reunion sin que antes el cliente te haya solicitado informacion sobre tus servicios.\nPara agendar una reunion solicita al usuario la siguiente informacion:\n1.nombre y apellidos\n2. Email\n3. Fecha y hora de la reunion\n4. Descripcion de la solucion que necesita\n\nUna vez que te haya dado toda la informacion utiliza tus herramientas para comprobar la disponibilidad y agendar reunciones, donde el titulo de la reuncion sera Consultoria IA {nombre} y la descripcion de la reuncion sera la {descripcion} aportada por el usuario.\n\n🛠️ Herramientas\n  Utiliza siempre tu Memory para mantener el hilo de la conversacion.Es muy importante que cuando le pidas datos al usuario consultes tu memory para no pedir datos de forma repetida\n  \"Knowler\": Cuando el usuario quiera informacion general.\n  \"Calculator\": Usa esta herramienta cuando el usuario te pida realizar una operacion matematica\n  \"Think\": Utiliza esta herramienta para analizar que accion realizar y mejorar tus respuestas\n  \"CheckDisponibilidad\": Cuando el usuario quiera agendar una cita primero usara esta herramienta para chequear la disponibilidad de la dfecha solicitada por el usuario en el calendario. Siempre tienes que jecutar esta herramienta antes de CrearReunion.\n\n  \"CrearReunion\": Utiliza esta herramienta para agendar una reunion.\n\n  \"SendEmail\": Envía un email solo cuando se haya completado correctamente el proceso previo.\n\n📐 Reglas y Lógica Operativa\n\nSolo se puede usar una herramienta por mensaje.\n\nEnviarEmail requiere que AgendarReunion se haya ejecutado antes.\n\nNo inventes datos; solicita cualquier información faltante.\n\nNo ejecutes herramientas sin intención explícita o implícita del usuario.\n\nNo realices acciones fuera del marco de las herramientas disponibles.\n\nMantén respuestas breves, claras y técnicas cuando corresponda.\n\n🔄 Flujo de Ejecución\n\nAnaliza intención del usuario.\n\nDetermina si se requiere herramienta.\n\nValida reglas y datos obligatorios.\n\nSi falta información → pregúntala.\n\nEjecuta herramienta cuando proceda.\n\nConfirma acción y resultado al usuario.\n\n🧪 Ejemplo 1 — Agendar reunión\n\nUsuario:\n“Necesito una reunión mañana a las 10.”\n\nAgente:\n“Necesito tu correo para programar la reunión. ¿Puedes proporcionarlo?”\n\n(Tras recibir correo)\n→ Ejecuta AgendarReunion\n\n🧪 Ejemplo 2 — Enviar email tras agendar\n\nUsuario:\n“Envíame un correo confirmando la reunión.”\n\nAgente (si ya se agendó):\n“Enviando confirmación…” → Ejecuta EnviarEmail\n\nAgente (si no se ha agendado):\n“Antes debo agendar la reunión. ¿Deseas que la programe ahora?”"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -32,
+        -80
+      ],
+      "id": "7750f926-dd84-42b8-8ed3-8ac10cee14bf",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {
+          "frequencyPenalty": 0,
+          "presencePenalty": 0,
+          "temperature": 0.4,
+          "topP": 0.9
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -544,
+        224
+      ],
+      "id": "cbcdbe83-bd44-439a-8510-635972d16163",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "n0wfPgDwiY0nvtW8",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -224,
+        224
+      ],
+      "id": "826d2d23-794d-4b13-8d42-ea8e55fe7a6b",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "content": "En un entorno de produccion no se puede usar esta memoria.\n\nEn el contexto cuanto mas le pongamos mejor porque recordara mas las interacciones",
+        "height": 128,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        352
+      ],
+      "id": "b9c0c97e-0024-463d-b917-ab283708a71d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Aqui debemos modificar la temperatura para que sea mas determinista y no sea creativo. Un 0,1 podria ser buena idea.\n\nEl top k > 0,9\nFrequency Penalty > 0.0\nPresence Penalty > 0.0"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        352
+      ],
+      "id": "e1a01655-d033-4ec7-bb4c-c3c0c3ac05aa",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Utiliza esta herramienta para obtener informacion de la empresa y el producto",
+        "operation": "get",
+        "documentURL": "=1pxfb91HOKRbc-iD3_psQOFR4moMuF1BA"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        624,
+        240
+      ],
+      "id": "94a8e3b1-aac5-49a2-916b-70388d756c58",
+      "name": "Knowler",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "eRhtH6TRQxVCDxFT",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        464,
+        240
+      ],
+      "id": "caff971d-18d6-44c6-ac5e-aad202731d0a",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        336,
+        240
+      ],
+      "id": "bf2e57a3-a717-4f46-b3ad-daedac11eb6d",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "content": "Esta herramienta obliga al agente a razonar a la hora de realizar ciertas accciones. NO CONSUME TOKENS"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        368
+      ],
+      "id": "a179714a-a0b4-42b0-826c-862b90c12537",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "Herrmientas para comprobar que fechas hay disponibles y otra para agendar una reunion.",
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        576
+      ],
+      "id": "4fcc113a-ad5e-441a-bf57-20e03958cff8",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Utiliza esta herramienta para buscar disponibilidad en el calendario",
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "mariano.saezsoriano@gmail.com",
+          "mode": "list",
+          "cachedResultName": "mariano.saezsoriano@gmail.com"
+        },
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start_Time', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End_Time', ``, 'string') }}",
+        "options": {
+          "timezone": {
+            "__rl": true,
+            "value": "Europe/Madrid",
+            "mode": "list",
+            "cachedResultName": "Europe/Madrid"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -96,
+        656
+      ],
+      "id": "a88fb5fc-36e7-465a-aedb-bb3aac955ead",
+      "name": "CheckDisponibilidad",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "WznQA6dKlkzBMCEP",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Usa esta herramienta para crear y agendar una reunion",
+        "calendar": {
+          "__rl": true,
+          "value": "mariano.saezsoriano@gmail.com",
+          "mode": "list",
+          "cachedResultName": "mariano.saezsoriano@gmail.com"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "attendees": [
+            "mariano.saezsoriano@gmail.com",
+            "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('attendees1_Attendees', `La IA aniadira invitados, uno mismo o sea yo y otro que ella decida segun la interaccion con el agente.`, 'string') }}"
+          ],
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', `La IA creara una descripcion de la reunion por si sola`, 'string') }}",
+          "sendUpdates": "all",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', `La IA creara un titulo de la reunion por si sola`, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        656
+      ],
+      "id": "04a39111-391c-4ce0-8f66-781f1bf50583",
+      "name": "CrearReunion",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "WznQA6dKlkzBMCEP",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Como integrar el chat en un front:\n1. Make Chat Publicly Available\n2. Mode: Hosted Chat\n3. Se puede poner autentificacion para el que quiera utilizarlo.\n4. En options se puede personalizar el chat\n5. Si copiamos el la url del chat en el navegador ya lo podremos usar \n\nSi queremos embeberlo en una pagina web tendremos que cambiar a embedded chat\n",
+        "height": 208,
+        "width": 672,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1088,
+        -304
+      ],
+      "id": "f055fbc2-2c41-4f02-bcd4-efe6fb263078",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', `En el mensaje tienes que incluir el porque de la reunion y ademas la informacion de Google Calendar para que el usuario acepte la asignacion de la reuncion.`, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        192,
+        256
+      ],
+      "id": "42db15bb-0a87-40eb-81a7-3d8e77467ef3",
+      "name": "SendEmail",
+      "webhookId": "cce244b9-a021-46a6-aad7-bae57c55a0b4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "D4cEbuX1DCtVGiuy",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Knowler": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CheckDisponibilidad": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CrearReunion": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendEmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Madrid",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "5b8691d7-0ea7-4189-b02e-8936331e87cd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "50e908245cf6cca64bb82f82936896e49b0c1624b5b3352ac4dfa73bc56481dc"
+  },
+  "id": "gE17dGzn0yrPGDqO",
+  "tags": []
+}

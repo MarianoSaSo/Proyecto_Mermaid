@@ -1,0 +1,1483 @@
+{
+  "name": "My workflow 6",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-2024-11-20",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-2024-11-20"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Create a good meta description for the following blog post: \n\n{{ $('Creador de Links Internos').item.json.message.content }}\n\nA good meta description for a blog post that is SEO-optimized should:\n- Be Concise: Stick to 150-160 characters to ensure the full description displays in search results. \n- Include Keywords: Incorporate primary keywords naturally to improve visibility and relevance to search queries.\n\nPrimary keyword = {{ $('Analista inicial').item.json.message.content['Primary Keyword'] }}\nMore keywords to include if possible = [{{ $('Analista inicial').item.json.message.content.Keywords }}]\n\n- Provide Value: Clearly describe what the reader will learn or gain by clicking the link. \n\n- Be Engaging: Use persuasive language, such as action verbs or a question, to encourage clicks. \n\n- Align with Content: Ensure the description accurately reflects the blog post to meet user expectations and reduce bounce rates. \n\nYour output must only be the meta description and nothing else. \n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        21940,
+        6500
+      ],
+      "id": "a3ce38c5-b25d-45de-8fe1-d36b14e356d2",
+      "name": "Meta description",
+      "credentials": {
+        "openAiApi": {
+          "id": "8hgw1j72mroqso8Q",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 🧠 1. TRANSCRIBIR + TRADUCIR REFERENCIA",
+        "height": 260,
+        "width": 920
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        19420,
+        6140
+      ],
+      "typeVersion": 1,
+      "id": "847c2ad3-62db-4600-9805-e23793c0ddd0",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## ✍️ 3. CREACIÓN DEL ARTÍCULO\n \n",
+        "height": 240,
+        "width": 1900,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        20400,
+        6140
+      ],
+      "typeVersion": 1,
+      "id": "76b18a7b-4bb0-4290-880a-4ae0885802f4",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## 🔗 4. OPTIMIZACIÓN SEO\n \n \n",
+        "height": 240,
+        "width": 1580,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        19540,
+        6420
+      ],
+      "typeVersion": 1,
+      "id": "320fa955-129a-4e2b-b68a-a74058ec66e8",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## 🏷️ 5. GENERACIÓN DE METADATOS\n\n \n \n",
+        "height": 240,
+        "width": 1080,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        21180,
+        6420
+      ],
+      "typeVersion": 1,
+      "id": "42924987-f943-488f-baf4-655937c68148",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## 🖼️ 6. VISUAL WRAP\n\n\n \n \n",
+        "height": 240,
+        "width": 500,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        19920,
+        6720
+      ],
+      "typeVersion": 1,
+      "id": "e09e33d2-925a-45ed-adc3-200ed4fbc3d7",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "title": "={{ $('Generador de títulos').item.json.message.content }}",
+        "additionalFields": {
+          "authorId": 5,
+          "content": "=<img src=\"{{ $json.Imagen }}\" alt=\"Cover Image\"> {{ $('Generador de HTML').item.json.message.content }}",
+          "slug": "={{ $('Generador de Slug').item.json.message.content }}",
+          "status": "publish",
+          "commentStatus": "closed",
+          "sticky": false,
+          "categories": [
+            43
+          ],
+          "postTemplate": {
+            "values": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.wordpress",
+      "typeVersion": 1,
+      "position": [
+        20900,
+        6800
+      ],
+      "id": "7594af2e-b197-4d82-9cb3-19ef19cfc904",
+      "name": "Wordpress",
+      "credentials": {
+        "wordpressApi": {
+          "id": "aKgU4wXjMVb09SHv",
+          "name": "Wordpress account 2 - divisualproject.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 🔜 8. PUBLICACIÓN FINAL\n\n\n\n\n\n \n \n",
+        "height": 240,
+        "width": 460,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        20820,
+        6720
+      ],
+      "typeVersion": 1,
+      "id": "33a1adc6-44a2-44d9-b9dc-e0f26344da09",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.perplexity.ai/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"sonar-pro\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are an expert researcher helping a content team enrich blog articles. Your role is to find high-quality, fact-based insights, statistics, and examples from credible and up-to-date sources that support or complement the topic of the article.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.message.content.split(/\\n+/).join(' ').replaceAll('\"', ' ') }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        21140,
+        6200
+      ],
+      "id": "fd7f36ca-2646-4b78-90d5-c1c8d2dba3ae",
+      "name": "Run Perplexity Research",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "vdVUYfHUj7cVPMlg",
+          "name": "Header Auth account - Perplexity"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "23b8e8c4-9191-415a-9661-1b60d413528a",
+              "name": "research",
+              "value": "={{ $json.choices[0].message.content.replaceAll(\"[1]\", \" - source: \" +$json.citations[0]).replaceAll(\"[2]\",\" source:\" +$json.citations[1]).replaceAll(\"[3]\",\" - source: \" +$json.citations[2]).replaceAll(\"[4]\",\" - source: \"+$json.citations[3]).replaceAll(\"[5]\",\" - source: \"+$json.citations[4]).replaceAll(\"[6]\",\" - source: \"+$json.citations[5]).replaceAll(\"[7]\",\" - source: \"+$json.citations[6]).replaceAll(\"[8]\",\" - source: \"+$json.citations[7]).replaceAll(\"[9]\",\" - source: \"+$json.citations[8]).replaceAll(\"[10]\",\" - source: \"+$json.citations[9]) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        21340,
+        6200
+      ],
+      "id": "60da1632-0154-4865-99b3-3098eca2e624",
+      "name": "Manual Link Fixer"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1TXJxLUoreFyiz4Fx9U_Lna3Zpgjs0kfgUgd2Ng4uXQw",
+          "mode": "list",
+          "cachedResultName": "VIDEO TRANSCRIPT PARA BLOG - CURSO N8N ADRIÁN SÁENZ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TXJxLUoreFyiz4Fx9U_Lna3Zpgjs0kfgUgd2Ng4uXQw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TXJxLUoreFyiz4Fx9U_Lna3Zpgjs0kfgUgd2Ng4uXQw/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Estado",
+              "lookupValue": "Publicado"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        19580,
+        6500
+      ],
+      "id": "7ea3c696-ab03-4ff8-b811-f9fa72c567f1",
+      "name": "Fetch Previous Blogs",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "i8uAjlC8WiPjtIsA",
+          "name": "Google Sheets divisual@divisualproject.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "previous-posts",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        19840,
+        6500
+      ],
+      "id": "9d0420fb-28e3-479f-908c-c5aab28da55c",
+      "name": "Aggregate Keywords"
+    },
+    {
+      "parameters": {
+        "url": "https://serpapi.com/search?engine=google_images",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $('Generador de títulos').item.json.message.content }}"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        19960,
+        6800
+      ],
+      "id": "a234d3a8-b08d-4872-8519-38d908586d30",
+      "name": "Fetch Cover Image",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "Sj6lgXnPLpB4mxeL",
+          "name": "Unnamed credential"
+        },
+        "httpQueryAuth": {
+          "id": "ntc6ZXmojySDEZpk",
+          "name": "Query Auth account - SerpAPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1f0541df-05ab-4e3d-a5d8-3904579fc8a9",
+              "name": "image-url",
+              "value": "={{ $json.images_results[1].original }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        20240,
+        6800
+      ],
+      "id": "17e58311-988d-4800-a3b7-421a02be4c84",
+      "name": "Final Edit Fields"
+    },
+    {
+      "parameters": {
+        "content": "# 📽️ Workflow: De YouTube a Blog en WordPress\n\n**Autor:** Creador por [Juan Pe Navarro](https://www.instagram.com/juanpe.divisual/)\n\n---\n\n# ✅ Paso 1 – Encendido de la idea\n\n### Activamos el flujo y tomamos el siguiente clúster de vídeos desde **Google Sheets**.  \n### ➡️ Extraemos el **título**, las **palabras clave** y la **transcripción** del contenido.\n\n---\n\n# ✅ Paso 2 – Núcleo estratégico\n\n### Con **GPT**, generamos una primera estructura del post. Luego usamos **Perplexity** para ampliar la investigación y validamos manualmente los enlaces.  \n### ➡️ Obtenemos un plan claro y bien fundamentado.\n\n---\n\n# ✅ Paso 3 – Creación del artículo\n\n### Convertimos el plan y la investigación en un artículo completo optimizado para **SEO**.  \n### ➡️ El contenido es limpio, extenso y de alto valor.\n\n---\n\n# ✅ Paso 4 – Optimización SEO\n\n### Recuperamos posts anteriores desde **Google Sheets** y añadimos **enlaces internos** relevantes dentro del texto (como URLs en crudo).  \n### ➡️ Esto potencia el posicionamiento mediante vinculación interna inteligente.\n\n---\n\n# ✅ Paso 5 – Generación de metadatos\n\nCreamos los metadatos esenciales del post:  \n- Slug  \n- Título  \n- Meta descripción  \n➡️ Todo basado en la versión final del artículo.\n\n---\n\n# ✅ Paso 6 – Envoltorio visual\n\n### Seleccionamos una imagen de portada adecuada mediante API y dejamos lista toda la parte visual.  \n### ➡️ Imagen optimizada para el blog y redes.\n\n---\n\n# ✅ Paso 7 – Publicación y registro\n\n### Convertimos el artículo a formato **HTML** y registramos todo en **Google Sheets**.  \n### ➡️ Garantizamos trazabilidad y control de calidad.\n\n---\n\n# ✅ Paso 8 – Publicación final\n\n### Publicamos el post directamente en **WordPress** con sus metadatos e imagen.  \n### ➡️ El blog ya está online y perfectamente rastreado.\n\n---\n\n\n\n\n🔧 Hecho con ❤️  por el equipo de [Divisual](https://www.instagram.com/juanpe.divisual/)\n",
+        "height": 2100,
+        "width": 740
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        18480,
+        5740
+      ],
+      "typeVersion": 1,
+      "id": "9d91dec3-a306-48aa-8dd1-3a3de5181569",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4",
+          "mode": "list",
+          "cachedResultName": "GPT-4"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are part of a team that creates world-class blog posts.\n\nYou are the team’s most skilled copywriter. Your role is to **continue and complete a long-form blog article**, following the detailed structure and tone of the first part.\n\nYou are given:\n- The **first half of the blog post** (already written).\n- The **detailed blog plan**, outlining all remaining sections.\n- A list of **research insights** to integrate where relevant.\n\n---\n\n🎯 Your task:\n\nContinue and **finish writing the blog post** in the same style and structure en idioma español.\n\n---\n\n### Guidelines\n\n#### ✅ Structure & Formatting\n- Continue where Part 1 ended. DO NOT rewrite the introduction or previous sections.\n- Follow the blog plan step by step.\n- Use proper H2/H3 headings.\n- Write **short paragraphs** (max 4 lines).\n- Use bullet points where needed.\n- Include LSI keywords or synonyms naturally.\n\n#### ✍️ Style & Tone\n- Write in a clear, simple tone (Year 5 level).\n- Add concrete value in every paragraph.\n- Be friendly, professional, and action-oriented.\n\n#### 🔍 SEO Requirements\n- Use all specified keywords (from the plan) in appropriate sections.\n- Include the **main keyword** at least once more near the end.\n- Do not keyword stuff, but weave terms naturally into the copy.\n\n#### 📌 Research Usage\n- Cite any research insight with the format:  \n  *(Source: [insert URL])*\n- Include all relevant research listed in the plan.\n\n#### 🛑 Do Not:\n- Repeat or rewrite anything from Part 1.\n- Summarize what was said before.\n- Say “as we saw earlier” — just continue smoothly.\n\n---\n\nNow, here is what you have:\n\n**First Half of the Blog Post**:  \n{{ $(\"Write Full Article 1\").item.json.message.content }}\n\n**Remaining Plan (continued)**:  \n{{ $(\"Borrador inicial\").item.json.message.content }}\n\n**Research Summaries**:  \n{{ $(\"Manual Link Fixer\").item.json.research }}\n\nNow write the **second half of the article**. Finish all sections cleanly. Include a final **Conclusion** and a detailed **FAQ** section.\nThe total length of this Part 2 should be around **1100+ words**."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        21860,
+        6200
+      ],
+      "id": "a273a686-9c96-45cb-b60d-ff860136fccb",
+      "name": "Write Full Article 2",
+      "credentials": {
+        "openAiApi": {
+          "id": "8hgw1j72mroqso8Q",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4",
+          "mode": "list",
+          "cachedResultName": "GPT-4"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are part of a team that creates world-class blog posts.\nYou are the team’s top copywriter, tasked with writing the first half of a complete blog article.\n\nFor each assignment, you are given:\n\nA detailed plan that breaks down the structure section by section, including headings, keywords, notes, and examples.\n\nA list of research summaries to integrate where appropriate.\n\n🎯 Your mission: Write the Part 1 of the blog post (from the introduction up to the middle of the article) based on the structure.\n\n✍️ Guidelines:\nStructure\nWrite a strong H1 title using the primary keyword.\n\nFollow the blog plan section by section, respecting the order.\n\nCover only the first half of the plan (introduction, common problems, core philosophy, and early steps).\n\nStop naturally at the mid-point, and leave the rest for Part 2.\n\nFormatting\nUse H2 and H3 headings from the plan with the exact keywords.\n\nUse short paragraphs (max 4 lines).\n\nUse bullet points where possible.\n\nInsert internal transitions that invite the reader to keep scrolling.\n\nStyle\nSimple and clear writing (Year 5 reading level).\n\nValue-dense: No fluff, no generic intros.\n\nAdd examples, analogies, metaphors, and concrete advice.\n\nWord Count\nAim for ~1,100 words in this part.\n\nSEO & Research\nInclude all relevant keywords in the appropriate headings and sections.\n\nIntegrate at least 4 research references, using this format:\n(Source: [insert URL])\n\nOutput Rules:\nReturn only the Part 1 blog content (from H1 to the natural halfway point).\n\nDo not include a conclusion or FAQ in this part.\n\nDo not summarize anything or describe what you’re doing.\n\nEl resultado debe ser en español perfecto.\n\nNow generate the first half of the blog post using:\n\nBlog Plan:\n{{ $('Borrador inicial').item.json.message.content }}\n\nResearch Summaries:\n{{ $('Manual Link Fixer').item.json.research }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        21540,
+        6200
+      ],
+      "id": "78e77e43-19f9-439e-8665-f991efcb92fa",
+      "name": "Write Full Article 1",
+      "credentials": {
+        "openAiApi": {
+          "id": "8hgw1j72mroqso8Q",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "##  7. REGISTRO\n\n\n\n\n\n \n \n",
+        "height": 240,
+        "width": 320,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        20440,
+        6720
+      ],
+      "typeVersion": 1,
+      "id": "2758d000-da82-4989-9829-9d0af5d53c14",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Eres parte de un equipo que crea artículos de blog de nivel mundial.\n\nPara cada nuevo proyecto de artículo, se te proporciona:\n- Una **transcripción de un video de YouTube** que resume las ideas centrales de una presentación hablada o un video.\n- Una lista de **palabras clave** que el artículo debe incluir para tener un buen rendimiento en los motores de búsqueda.\n- Una **intención de búsqueda** que describe lo que el usuario espera aprender o lograr con el artículo.\n- Una **palabra clave principal**, que debe aparecer en el título y en el primer párrafo del artículo.\n\nTu tarea es analizar la transcripción, comprender la estructura lógica de las ideas y mensajes, y proponer un **plan preliminar para el artículo**. Este plan será utilizado por un estratega de contenidos para redactar el artículo completo.\n\nTu respuesta debe:\n- Identificar los **temas centrales** y los **puntos clave de discusión** a partir de la transcripción.\n- Respetar la **intención** del contenido (informativo, inspirador, práctico...).\n- Asegurarte de que **todas las palabras clave estén integradas de forma natural** en el contenido.\n- Estar estructurada en **formato de viñetas**, con secciones claras y flujo lógico.\n\nImportante:\n- No estás escribiendo el artículo, solo un esquema en formato de puntos.\n- El plan debe girar en torno a la **palabra clave principal**.\n- Asegúrate de que la **intención de búsqueda del usuario esté completamente satisfecha** con el plan.\n- Usa la transcripción para **extraer contenido significativo**, no solo para rellenar con texto SEO.\n- Ten en cuenta el blog anterior para no sonar repetitivo y/o hacer referencias.\n\n---\n\n**Transcripción:**  \n{{ $('Traductor').item.json.message.content }}\n\n**Palabras clave:**  \n{{ $json.message.content.Keywords }}\n\n**Intención de búsqueda:**  \n{{ $json.message.content['Search Intent'] }}\n\n**Palabra clave principal:**  \n{{ $json.message.content['Primary Keyword'] }}\n\n**Blog Anterior**\n\n\n---\n\nCrea el plan preliminar del artículo."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        20780,
+        6200
+      ],
+      "id": "57485658-dc14-4c99-84a8-9c441e307a51",
+      "name": "Borrador inicial",
+      "credentials": {
+        "openAiApi": {
+          "id": "8hgw1j72mroqso8Q",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyWeek",
+              "hour": 9
+            }
+          ]
+        },
+        "feedUrl": "https://rss.app/feeds/zHzevQHL7MEnld9O.xml"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        19460,
+        6200
+      ],
+      "id": "9733430b-0a3f-4722-a71b-f41decd3d4be",
+      "name": "RSS Feed Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1TXJxLUoreFyiz4Fx9U_Lna3Zpgjs0kfgUgd2Ng4uXQw",
+          "mode": "list",
+          "cachedResultName": "VIDEO TRANSCRIPT PARA BLOG - CURSO N8N ADRIÁN SÁENZ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TXJxLUoreFyiz4Fx9U_Lna3Zpgjs0kfgUgd2Ng4uXQw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TXJxLUoreFyiz4Fx9U_Lna3Zpgjs0kfgUgd2Ng4uXQw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Link": "={{ $('RSS Feed Trigger').item.json.link }}",
+            "Título": "={{ $('RSS Feed Trigger').item.json.title }}",
+            "Transcripción": "={{ $json.message.content }}",
+            "Estado": "En espera"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Link",
+              "displayName": "Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Título",
+              "displayName": "Título",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Transcripción",
+              "displayName": "Transcripción",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        20220,
+        6200
+      ],
+      "id": "590945f7-104a-450e-9d2c-d5a9a3e44521",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "i8uAjlC8WiPjtIsA",
+          "name": "Google Sheets divisual@divisualproject.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "o3-mini",
+          "mode": "list",
+          "cachedResultName": "O3-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.transcript }}"
+            },
+            {
+              "content": "=Eres un traductor experto con enfoque en SEO y conocimiento profundo de expresiones idiomáticas tanto en inglés como en español. Recibirás una transcripción de un vídeo de YouTube en inglés. Tu tarea es traducirla al español natural y perfecto, adaptando expresiones, tonos y frases coloquiales al lenguaje cotidiano y fluido del español.",
+              "role": "system"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        19900,
+        6200
+      ],
+      "id": "c35575c7-b530-4e88-b45c-f514ffa837eb",
+      "name": "Traductor",
+      "credentials": {
+        "openAiApi": {
+          "id": "8hgw1j72mroqso8Q",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $('Traductor').item.json.message.content }}"
+            },
+            {
+              "content": "=Eres un analista SEO experto en generación de contenido estratégico.\n\nTu tarea es leer la siguiente transcripción de un video de YouTube y extraer:\n1. Una **palabra clave principal**: la más relevante y representativa del tema tratado. Debe ser clara, específica, con potencial de búsqueda y capaz de aparecer en el título de un artículo.\n2. De 5 a 10 **palabras clave secundarias o relacionadas**: términos relevantes que pueden ayudar a posicionar el contenido en motores de búsqueda. Incluye sinónimos, términos long-tail y conceptos relacionados.\n3. La **intención de búsqueda** del usuario: define si el contenido es informativo, educativo, comercial, transaccional, etc., y qué objetivo tiene el usuario al consumir este contenido.\n\nNo generes texto de más. Devuelve los datos en formato limpio y claro:\n\n---\n\n**Primary Keyword:**  \n[palabra clave principal]\n\n**Keywords:**  \n- [keyword 1]  \n- [keyword 2]  \n- [keyword 3]  \n...\n\n**Search Intent:**  \n[intención de búsqueda resumida en una frase]\n\n---\n",
+              "role": "system"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        20460,
+        6200
+      ],
+      "id": "b116d597-446b-4134-9432-93edbac2e894",
+      "name": "Analista inicial",
+      "credentials": {
+        "openAiApi": {
+          "id": "8hgw1j72mroqso8Q",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1TXJxLUoreFyiz4Fx9U_Lna3Zpgjs0kfgUgd2Ng4uXQw",
+          "mode": "list",
+          "cachedResultName": "VIDEO TRANSCRIPT PARA BLOG - CURSO N8N ADRIÁN SÁENZ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TXJxLUoreFyiz4Fx9U_Lna3Zpgjs0kfgUgd2Ng4uXQw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TXJxLUoreFyiz4Fx9U_Lna3Zpgjs0kfgUgd2Ng4uXQw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Link": "={{ $('Google Sheets').item.json.Link }}",
+            "Título": "={{ $('Google Sheets').item.json['Título'] }}",
+            "Transcripción": "={{ $('Google Sheets').item.json['Transcripción'] }}",
+            "Estado": "={{ $('Google Sheets').item.json.Estado }}",
+            "HTML": "={{ $json.message.content }}"
+          },
+          "matchingColumns": [
+            "Link"
+          ],
+          "schema": [
+            {
+              "id": "Link",
+              "displayName": "Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Título",
+              "displayName": "Título",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Transcripción",
+              "displayName": "Transcripción",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HTML",
+              "displayName": "HTML",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        20440,
+        6500
+      ],
+      "id": "a9cb5773-7cae-41ca-8b4e-2b7eb58982cd",
+      "name": "Cargar HTML a Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "i8uAjlC8WiPjtIsA",
+          "name": "Google Sheets divisual@divisualproject.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "o1-mini-2024-09-12",
+          "mode": "list",
+          "cachedResultName": "O1-MINI-2024-09-12"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are part of a team that creates world-class blog posts.\n\nYour job is to handle **internal linking** between blog posts to enhance SEO and reader navigation.\n\nFor each new blog post, you are given:\n- The **full HTML content of the current blog**, split into two parts: `html_part_1` and `html_part_2`.\n- A list of **previous blog posts** with their titles, summaries, keywords, and URLs.\n\n---\n\n### 🧠 Your mission:\n\nIdentify and insert **at least 5 internal links** pointing to previous blog posts, only if they are **highly relevant**.\n\n---\n\n### ✅ Linking Criteria:\n\n- Use the **title**, **meta description**, and **keywords** of previous blog posts to find relevant sections in the current HTML.\n- Only insert links if the previous post’s topic is **closely related** and **adds value** for the reader.\n- Avoid keyword stuffing or irrelevant insertions. **Quality and contextual value > quantity**.\n\n---\n\n### 🔧 How to add links:\n\n- Insert the **raw URL** (e.g., `https://mydomain.com/blog-post-url`) **directly into the HTML**, at the **most relevant position** within `<p>` or `<li>` tags.\n- Do **not use anchor tags**, Markdown, or HTML attributes.\n- Do **not modify** the structure or content of the blog post.\n- Do **not reformat or rewrite** any existing part of the HTML, headings, or layout.\n- You may insert the same link more than once **only if** it’s naturally relevant in multiple sections.\n\n---\n\n### 🧾 Output format:\n\nReturn the **modified blog post** as a JSON object with these two fields:\n- `html_part_1`: the updated first part of the HTML\n- `html_part_2`: the updated second part of the HTML\n\nDo **not return** the previous blog post list.  \nDo **not explain your work** or include any commentary.\n\n---\n\nNow process this:\n\n**HTML**  \n{{ $('Generador de HTML').item.json.message.content }}\n\n**Previous Blog Posts**:  \n{{ $('Aggregate Keywords').item.json['previous-posts'][0].HTML }}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        20740,
+        6500
+      ],
+      "id": "8dcfb470-3c81-4540-99c9-6c3e504222be",
+      "name": "Creador de Links Internos",
+      "credentials": {
+        "openAiApi": {
+          "id": "8hgw1j72mroqso8Q",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-2024-11-20",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-2024-11-20"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Extract the blog post title from the following blog post: \n{{ $('Creador de Links Internos').item.json.message.content }}\n\n\n\nThe blog post title must include the primary keyword {{ $('Analista inicial').item.json.message.content['Primary Keyword'] }} and must inform the users right away of what they can expect from reading the blog post. \n\n- Don't put the output in \"\". The output should just text with no markdown or formatting. \n\nYour output must only be the blog post title and nothing else. "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        21580,
+        6500
+      ],
+      "id": "8e24884e-5a4b-4bdd-8954-df1c0193653f",
+      "name": "Generador de títulos",
+      "credentials": {
+        "openAiApi": {
+          "id": "8hgw1j72mroqso8Q",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Apps y Costes\n\n- Apify API -> $1/mes\n- Chat GPT -> Por uso de API\n- Perplexity -> Por uso de API\n- SerpAPI -> Gratis hasta 100 búsquedas al mes\n\n\n# Coste total por cada Blog:\n## 0.23€ por blog (+ $1 de Apify al mes)",
+        "height": 300,
+        "width": 560,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        19260,
+        7060
+      ],
+      "id": "2abe775c-a097-404c-9351-2af738327025",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Tiempo de ejecución aproximado: 8min",
+        "height": 80,
+        "width": 480
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        18940,
+        7760
+      ],
+      "id": "5881383d-4d24-4029-ae33-c4b921b54ec5",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Create a slug for the following blog post: \n{{ $('Creador de Links Internos').item.json.message.content }}\n\nA slug in a blog post is the part of the URL that comes after the domain name and identifies a specific page. It is typically a short, descriptive phrase that summarizes the content of the post, making it easier for users and search engines to understand what the page is about. For example, in the URL www.example.com/intelligent-agents, the slug is intelligent-agents. A good slug is concise, contains relevant keywords, and avoids unnecessary words to improve readability and SEO. \n\nThe slug must be 4 or 5 words max and must include the primary keyword of the blog post which is {{ $('Analista inicial').item.json.message.content['Primary Keyword'] }} \n\nYour output must be the slug and nothing else so that I can copy and paste your output and put it at the end of my blog post URL to post it right away. "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        21220,
+        6500
+      ],
+      "id": "2d783d89-6098-4f05-8a78-00f43bf28b99",
+      "name": "Generador de Slug",
+      "credentials": {
+        "openAiApi": {
+          "id": "8hgw1j72mroqso8Q",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "o1-preview",
+          "mode": "list",
+          "cachedResultName": "O1-PREVIEW"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=DO NOT OUTPUT ANYTHING OTHER THAN THE CODE. I want you to follow the layout of the template as a guide to generate the WordPress code for a blog post. Here are the rules to follow:\n\nThe blog post should have a title, estimated reading time, key takeaways, table of contents, body, and FAQ in this order.  \nMake it engaging by using italics, dot points, quotes, bold, spaces, and sometimes new lines. Never use emojis.\n\nThe blog post will have some URLs referenced next to certain keyphrases to show where the info came from. You must hyperlink the keyphrase with the provided URL so that the reader can click on the referenced URL. It is critical you get this right.\n\nWrap the entire content in a container <div> with inline CSS that sets the text color to white (#ffffff), uses a legible font such as Arial, sans-serif, and sets line-height to 1.6.  \nEnsure that all non-heading text elements (e.g., paragraphs, list items) have an inline style or embedded style that sets their font size to 20px and color to white (#ffffff) using !important to override theme styles.\n\nHyperlinks, points in the table of contents, and FAQ questions must be styled in yellow (#fac51c).  \nAll headings and subheadings should have an underline implemented via a bottom border in yellow (#fac51c) with appropriate padding.  \nPlace a double break (<br><br>) between each section to improve readability.  \nDo not output any extra text or mention code tags like HTML''' around the output; just output the HTML code.\n\n---\n\n## Blog post:\n\nHere is the full content of the blog post, split into two parts. You must merge and format both parts seamlessly to create the final HTML output.\n\n**Part 1:**  \n{{ $('Write Full Article 1').item.json.message.content }}\n\n**Part 2:**  \n{{ $('Write Full Article 2').item.json.message.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        20060,
+        6500
+      ],
+      "id": "15b08e80-cc47-4e6f-b3e0-cf8472772a09",
+      "name": "Generador de HTML",
+      "credentials": {
+        "openAiApi": {
+          "id": "8hgw1j72mroqso8Q",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1TXJxLUoreFyiz4Fx9U_Lna3Zpgjs0kfgUgd2Ng4uXQw",
+          "mode": "list",
+          "cachedResultName": "VIDEO TRANSCRIPT PARA BLOG - CURSO N8N ADRIÁN SÁENZ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TXJxLUoreFyiz4Fx9U_Lna3Zpgjs0kfgUgd2Ng4uXQw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TXJxLUoreFyiz4Fx9U_Lna3Zpgjs0kfgUgd2Ng4uXQw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Link": "={{ $('Google Sheets').item.json.Link }}",
+            "Título": "={{ $('Google Sheets').item.json['Título'] }}",
+            "Transcripción": "={{ $('Google Sheets').item.json['Transcripción'] }}",
+            "Estado": "Publicado",
+            "HTML": "={{ $('Generador de HTML').item.json.message.content }}"
+          },
+          "matchingColumns": [
+            "Link"
+          ],
+          "schema": [
+            {
+              "id": "Link",
+              "displayName": "Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Título",
+              "displayName": "Título",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Transcripción",
+              "displayName": "Transcripción",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HTML",
+              "displayName": "HTML",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        21120,
+        6800
+      ],
+      "id": "7006d7c1-c54b-46d0-b21c-4fa5190d3a39",
+      "name": "Actualizar \"Publicado\"",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "i8uAjlC8WiPjtIsA",
+          "name": "Google Sheets divisual@divisualproject.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "PON_AQUI_EL_EMAIL_DE_LA_PERSONA_QUE_REVISE",
+        "subject": "[Revisión] | Nuevo Blog Divisual 🚀",
+        "emailType": "text",
+        "message": "=Enlace del nuevo blog: {{ $('Wordpress').item.json.guid.rendered }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        21340,
+        6800
+      ],
+      "id": "e6f82a8c-949a-4c51-a12f-d24adc29df6a",
+      "name": "Avisar al equipo",
+      "webhookId": "fba2227b-1dc8-4d90-b650-b6897e14286e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "IokBtq93nPyyaQsm",
+          "name": "Gmail divisual@divisualproject.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# 🚀 La Tribu Divisual\n\n## Este agente tiene un valor en el mercado de **$500 por mes.**\n\n## Accede a **La Tribu Divisual** para aprender a crear agentes más avanzados y generar altos ingresos de forma real y segura.\n\n# 👉 [Click aquí para unirte a la Lista de espera](https://divisualproject.academy/)\n",
+        "height": 320,
+        "width": 800,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        21520,
+        6720
+      ],
+      "id": "44eefa47-4475-4641-ba77-f6d7d64b7bfd",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/insight_api_labs~youtube-transcript-1-month---reliable-efficient/run-sync-get-dataset-items?token=PEGA_AQUI_TU_API_KEY_DE_APIFY",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"video_urls\": [\n        {\n            \"url\": \"{{ $json.link }}\",\n            \"method\": \"GET\"\n        }\n    ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        19720,
+        6200
+      ],
+      "id": "adc0174b-5b94-47d5-90c6-d611cf3f8812",
+      "name": "HTTP Request - Apify"
+    },
+    {
+      "parameters": {
+        "content": "## Plantilla de Google Sheet\n[Pulsa aquí](https://docs.google.com/spreadsheets/d/1TXJxLUoreFyiz4Fx9U_Lna3Zpgjs0kfgUgd2Ng4uXQw/edit?gid=0#gid=0)",
+        "height": 120,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        20180,
+        6040
+      ],
+      "id": "7ce04a54-be62-4d87-b905-9d1f2efeaa65",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1TXJxLUoreFyiz4Fx9U_Lna3Zpgjs0kfgUgd2Ng4uXQw",
+          "mode": "list",
+          "cachedResultName": "VIDEO TRANSCRIPT PARA BLOG - CURSO N8N ADRIÁN SÁENZ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TXJxLUoreFyiz4Fx9U_Lna3Zpgjs0kfgUgd2Ng4uXQw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1097467970,
+          "mode": "list",
+          "cachedResultName": "Control de publicaciones",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TXJxLUoreFyiz4Fx9U_Lna3Zpgjs0kfgUgd2Ng4uXQw/edit#gid=1097467970"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Imagen": "={{ $json['image-url'] }}",
+            "Meta-Descripción": "={{ $('Meta description').item.json.message.content }}",
+            "Título del Blog": "={{ $('Generador de títulos').item.json.message.content }}",
+            "Slug": "={{ $('Generador de Slug').item.json.message.content }}",
+            "HTML": "={{ $('Generador de HTML').item.json.message.content }}",
+            "Keywords": "={{ $('Analista inicial').item.json.message.content.Keywords }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Título del Blog",
+              "displayName": "Título del Blog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Keywords",
+              "displayName": "Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Slug",
+              "displayName": "Slug",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Meta-Descripción",
+              "displayName": "Meta-Descripción",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Imagen",
+              "displayName": "Imagen",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HTML",
+              "displayName": "HTML",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        20540,
+        6800
+      ],
+      "id": "e349e0de-4231-4728-a380-9a43a3d85c26",
+      "name": "Guardar en Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "i8uAjlC8WiPjtIsA",
+          "name": "Google Sheets divisual@divisualproject.com"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Meta description": {
+      "main": [
+        [
+          {
+            "node": "Fetch Cover Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Perplexity Research": {
+      "main": [
+        [
+          {
+            "node": "Manual Link Fixer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Link Fixer": {
+      "main": [
+        [
+          {
+            "node": "Write Full Article 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Previous Blogs": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Keywords": {
+      "main": [
+        [
+          {
+            "node": "Generador de HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Cover Image": {
+      "main": [
+        [
+          {
+            "node": "Final Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Guardar en Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Full Article 2": {
+      "main": [
+        [
+          {
+            "node": "Fetch Previous Blogs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Full Article 1": {
+      "main": [
+        [
+          {
+            "node": "Write Full Article 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Borrador inicial": {
+      "main": [
+        [
+          {
+            "node": "Run Perplexity Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Feed Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Apify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Analista inicial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Traductor": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analista inicial": {
+      "main": [
+        [
+          {
+            "node": "Borrador inicial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cargar HTML a Sheet": {
+      "main": [
+        [
+          {
+            "node": "Creador de Links Internos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Creador de Links Internos": {
+      "main": [
+        [
+          {
+            "node": "Generador de Slug",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generador de títulos": {
+      "main": [
+        [
+          {
+            "node": "Meta description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generador de Slug": {
+      "main": [
+        [
+          {
+            "node": "Generador de títulos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generador de HTML": {
+      "main": [
+        [
+          {
+            "node": "Cargar HTML a Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wordpress": {
+      "main": [
+        [
+          {
+            "node": "Actualizar \"Publicado\"",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar \"Publicado\"": {
+      "main": [
+        [
+          {
+            "node": "Avisar al equipo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Apify": {
+      "main": [
+        [
+          {
+            "node": "Traductor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar en Sheet": {
+      "main": [
+        [
+          {
+            "node": "Wordpress",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4f420a37-dfb1-41e5-b29c-de87139e51da",
+  "meta": {
+    "instanceId": "2723e5c0cdf73e609a9d6131a4145b2656ca7463c71fa761a441dc255964ffd8"
+  },
+  "id": "JgLJz456oriiL7W9",
+  "tags": [
+    {
+      "createdAt": "2025-06-01T18:57:05.689Z",
+      "updatedAt": "2025-06-01T18:57:05.689Z",
+      "id": "uhDg4e01CCZHetVc",
+      "name": "Curso Adrián Sáenz"
+    },
+    {
+      "createdAt": "2025-05-13T08:00:58.464Z",
+      "updatedAt": "2025-05-13T08:00:58.464Z",
+      "id": "IxHXOpyTZspV9j2o",
+      "name": "La Tribu Divisual"
+    }
+  ]
+}

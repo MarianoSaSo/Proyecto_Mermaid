@@ -1,0 +1,207 @@
+{
+  "name": "scraper_web",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -16
+      ],
+      "id": "aa716a61-6dba-41f5-94c2-372fc7ecc1f0",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.firecrawl.dev/v2/scrape",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer fc-f8bbabf646c84ee5bcaed1fc5fde68df"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"url\": \"https://books.toscrape.com/\",\n  \"formats\": [\n    {\n      \"type\": \"json\",\n      \"prompt\": \"Extrae de la URL de la libreria una lista de books con los siguientes conceptos: nombre, precio tipo numerico, stock tipo boolean, url  y la imagen\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -112,
+        -16
+      ],
+      "id": "73a5f12c-555a-4f35-9f61-23fa9031dbcd",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "323545e8-5593-4986-b45a-a53c20e10bec",
+              "leftValue": "={{ $json.precio }}",
+              "rightValue": 50,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "be820bf0-5500-45db-8f2a-d71856426285",
+              "leftValue": "={{ $json.stock }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        -16
+      ],
+      "id": "abad5f9d-591a-41fd-b5a0-348e14aaf024",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.json.books",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        48,
+        -16
+      ],
+      "id": "05ad7bf3-8d63-4f02-ac06-09454f5fc496",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "instructions": "Devuelve un solo item de n8n que muestre listados los items de entrada, el nombre en negrita, imagen, precio y un enlace con el texto ver libro, usando las claves: nombre precio stock(como disponible/no disponible) url imagen. Incluye saltos de linea. Esto va a ser para un correo electronico formateado en HTML. Asegurate de que sea estetico y funcional.",
+        "codeGeneratedForPrompt": "Devuelve un solo item de n8n que muestre listados los items de entrada, el nombre en negrita, imagen, precio y un enlace con el texto ver libro, usando las claves: nombre precio stock url imagen. Incluye saltos de linea. Esto va a ser para un correo electronico formateado en HTML. Asegurate de que sea estetico y funcional.",
+        "jsCode": "const items = $input.all();\nlet html = `<h2>Libros disponibles</h2>`;\nhtml += `<ul>`;\nitems.forEach((item) => {\n  html += `<li>\n    <strong>${item.json.nombre}</strong><br>\n    <img src=\"${item.json.imagen}\" alt=\"${item.json.nombre}\"><br>\n    Precio: ${item.json.precio}<br>\n    <a href=\"${item.json.url}\">Ver libro</a>\n  </li><br>`;\n});\nhtml += `</ul>`;\nreturn [{ json: { html }, pairedItem: items.map((_, index) => index) }];\n"
+      },
+      "type": "n8n-nodes-base.aiTransform",
+      "typeVersion": 1,
+      "position": [
+        432,
+        -16
+      ],
+      "id": "a26c75f4-931c-436d-80e5-4ab572535735",
+      "name": "AI Transform"
+    },
+    {
+      "parameters": {
+        "sendTo": "mariano.saezsoriano@gmail.com",
+        "subject": "scrap",
+        "message": "={{ $json.html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        640,
+        -16
+      ],
+      "id": "801a116c-6e67-448d-a369-4e0ebdcfb9ad",
+      "name": "Send a message",
+      "webhookId": "69c74004-f4bd-4648-af9b-75782784d777",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "N1z1pkS7BLpMT2xW",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "AI Transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Transform": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "da8b159a-ea2b-4889-83e8-1aa39c6afc13",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "270d7de402522376d919cc839010a9ff4ff124d265120378ad91954c359f5497"
+  },
+  "id": "QhrTKwisat4o9eJi",
+  "tags": []
+}

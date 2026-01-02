@@ -1,0 +1,91 @@
+{
+  "name": "Funciones_JavaScript",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        -16
+      ],
+      "id": "b4fde6bf-90ce-49c0-97e7-8655dafb02f9",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json.nombre }}",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -192,
+        -16
+      ],
+      "id": "5164a0f9-faa1-4639-b34e-c795b70d2b2d",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {
+    "When clicking ‘Execute workflow’": [
+      {
+        "json": {
+          "nombre": "Mariano Saez Soriano",
+          "edad": 42,
+          "email": "mariano.saezsoriano@gmail.com",
+          "telefono": "+34 612 345 678",
+          "linkedin": "https://www.linkedin.com/in/marianosaezsoriano",
+          "empresa": {
+            "nombre": "Trans Logistics Camaral",
+            "sector": "Transporte",
+            "empleados": 120
+          },
+          "esCliente": true,
+          "preferencias": [
+            {
+              "tipo": "email",
+              "valor": "mariano.saezsoriano@gmail.com",
+              "activo": true
+            },
+            {
+              "tipo": "telefono",
+              "valor": "+34 612 345 678",
+              "activo": false
+            },
+            {
+              "tipo": "whatsapp",
+              "valor": "+34 612 345 678",
+              "activo": true
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "255eb27a-51ee-4420-b83a-44926cca2663",
+  "meta": {
+    "instanceId": "50e908245cf6cca64bb82f82936896e49b0c1624b5b3352ac4dfa73bc56481dc"
+  },
+  "id": "P7s865IJ738QQT8b",
+  "tags": []
+}

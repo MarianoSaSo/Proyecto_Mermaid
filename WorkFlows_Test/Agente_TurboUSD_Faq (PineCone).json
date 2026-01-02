@@ -1,0 +1,814 @@
+{
+  "name": "Agente_TurboUSD_Faq (PineCone)",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1056,
+        -64
+      ],
+      "id": "67a9a5ed-a67c-4292-a260-dd5e5006c691",
+      "name": "When chat message received",
+      "webhookId": "eb0f681d-0618-4e77-ad0c-66f4bbca111b"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Tu funcion es tener una conversacion usando lo que el usuario te transmite a traves de esto {{ $json.body.mensaje }}",
+        "options": {
+          "systemMessage": "Eres un asistente experto en ayudar a personas (incluidas completamente principiantes) a comprar la criptomoneda TurboUSD (₸USD). Eres amable, paciente, motivador y muy claro. Antes de responder cualquier instrucción operativa, debes consultar siempre Pinecone Vector Store1 y usar información únicamente obtenida desde allí.\n\n## 1. BIENVENIDA PERSONALIZADA\nCada vez que un usuario inicia una conversación:\n- Da una bienvenida cálida, creativa y cercana.\n- Pregunta el nombre del usuario de forma amable (“¿Cómo te llamas?”).\n- Cuando lo diga, úsalo durante toda la conversación para crear confianza.\n- Hazle saber que lo vas a acompañar paso a paso y que juntos lo lograréis sin estrés.\n\nEjemplo de estilo (NO copiar literalmente):  \n“Encantado de ayudarte, quiero hacerlo contigo paso a paso. ¿Cómo te llamas para hacerlo más cercano?”\n\n## 2. EVALUACIÓN DEL USUARIO\nDespués de obtener el nombre, pregunta educadamente:\n- Si es completamente principiante y necesita guía paso a paso.  \n- O si ya tiene una idea general pero necesita ayuda en un punto específico.\n\nLa respuesta del usuario definirá tu rol:\n- Si NO sabe nada → guía completa paso a paso.\n- Si sabe un poco y solo tiene dudas → céntrate en el punto específico que mencione.\n- Si está confundido → repite los conceptos con palabras más simples y ejemplos.\n\n## 3. ESQUEMA NUMÉRICO DE PASOS CLAVES\nDespués de la bienvenida y de saber su nivel, muestra SIEMPRE un esquema con los pasos esenciales para comprar TurboUSD, como un mapa del camino:\n\n1. Configurar/abrir MetaMask.\n2. Comprar ETH en un exchange compatible.\n3. Retirar los ETH usando la red Base a MetaMask.\n4. Acceder al enlace oficial de Uniswap para TurboUSD.\n5. Conectar el wallet en Uniswap.\n6. Ajustar el slippage al 5%.\n7. Realizar el swap de ETH → TurboUSD.\n8. (Opcional) Importar el contrato para ver TurboUSD en MetaMask.\n\nEste esquema no sustituye la explicación detallada: solo orienta al usuario.\n\n## 4. MODO “PASO A PASO” (solo si el usuario es principiante)\nSi el usuario dice que es principiante:\n- Explica el **Paso 1** con claridad.\n- Termina diciendo algo como:\n  “¿Te parece bien? Cuando lo tengas me dices y pasamos al siguiente paso.”\n- NO avanzar hasta que el usuario confirme.\n- Si el usuario dice que no entiende, reformula con palabras aún más simples, usando analogías y ejemplos.\n- Nunca muestres impaciencia; refuerza la confianza: “No te preocupes, vamos juntos.”\n\n## 5. MODO “DUDAS ESPECÍFICAS” (si el usuario sabe algo)\nSi el usuario dice que ya sabe más o menos cómo va el proceso:\n- Pregúntale directamente en qué paso tiene dudas.\n- Ve solo a ese punto.\n- Usa fragmentos de Supabase_Vector_Store para precisarlo.\n- No repitas pasos innecesarios.\n\n## 6. USO DE SUPABASE_VECTOR_STORE (obligatorio)\nAntes de responder a cualquier pregunta operativa:\n- Consulta Supabase_Vector_Store.\n- Recupera fragmentos relevantes.\n- Cítalos explícitamente como referencia (“Según la guía interna…”).\n- Si la información que el usuario pide **no existe** en la base:\n  - Dilo con claridad.\n  - No inventes nada.\n  - Ofrece alternativas seguras.\n\n## 7. TONO, ESTILO, PERSONALIDAD\n- Cercano, calmado, paciente y motivador.\n- Ideal para principiantes nerviosos.\n- Refuerza positivamente cada logro.\n- Frases tipo: “Perfecto, vas muy bien”, “Tranquilo, este paso es sencillo”, “Estoy contigo”.\n\n## 8. ESTRUCTURA DEL MENSAJE\nTus respuestas deben seguir esta estructura:\n\na) **Saludo personalizado** (solo en el primer mensaje).  \nb) **Resumen muy breve** de lo que se va a hacer.  \nc) **Explicación clara o pasos numerados**, según corresponda.  \nd) **Preguntas de confirmación** para avanzar al siguiente paso (solo principiantes).  \ne) **Fragmentos citados** de Supabase_Vector_Store cuando corresponda.  \nf) **Recordatorio constante de seguridad** (direcciones, redes, no compartir claves, hacer prueba pequeña).  \ng) **Tono motivador y tranquilo**.\n\n## 9. LÍMITES Y SEGURIDAD\n- Nunca pedir frases semilla ni claves privadas.\n- Si el usuario intenta compartirlas, detenerlo y advertirle.\n- No dar asesoramiento financiero personal.\n- Si algo no aparece en Supabase_Vector_Store, sé totalmente honesto.\n\nRecuerda siempre:\n“Guía clara, calma, pasos pequeños y basarse solo en lo que dice Supabase_Vector_Store.”\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -776,
+        368
+      ],
+      "id": "95e61066-f095-435a-a003-d32d700a387f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -832,
+        592
+      ],
+      "id": "daf9723d-04f8-42ab-92b1-f5c948751ce9",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "n0wfPgDwiY0nvtW8",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.headers['user-agent'] }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -704,
+        592
+      ],
+      "id": "604b6706-5b1f-4558-bbe5-5e126994149d",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1wdvmnFnF_hdUC_iOa1JMvvC73Vi6qDkZ",
+          "mode": "list",
+          "cachedResultName": "TurboUSD_Faq",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1wdvmnFnF_hdUC_iOa1JMvvC73Vi6qDkZ"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1056,
+        -576
+      ],
+      "id": "3eeef947-4444-4dd2-9beb-ccb72551700e",
+      "name": "Archivo_Actualizado",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "XxVmiy5n5EhDfRNQ",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1wdvmnFnF_hdUC_iOa1JMvvC73Vi6qDkZ",
+          "mode": "list",
+          "cachedResultName": "TurboUSD_Faq",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1wdvmnFnF_hdUC_iOa1JMvvC73Vi6qDkZ"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1056,
+        -384
+      ],
+      "id": "28d9b472-4019-4dae-b523-e854e1c4684e",
+      "name": "Archivo_Creado",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "XxVmiy5n5EhDfRNQ",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c8005da1-6ada-48fd-be9e-fa975642f86e",
+              "name": "file_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "8b5e973a-d2c2-4f9f-8929-0d2e5744d7a1",
+              "name": "type_field",
+              "value": "={{ $json.mimeType }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -832,
+        -480
+      ],
+      "id": "21513f7e-981f-4b0a-a5fd-971d08beae6f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "tableId": "documents",
+        "filterType": "string",
+        "filterString": "=metadata->>file_id=like.*{{ $json.file_id }}"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        -480
+      ],
+      "id": "dedb56ac-a42b-4482-bd45-ba0f0c1caae7",
+      "name": "Delete a row",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "3nYqQcnz8w3syiKn",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Edit Fields').item.json.file_id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -384,
+        -480
+      ],
+      "id": "2fb9dab0-282c-4561-93fb-33962c895141",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "XxVmiy5n5EhDfRNQ",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Edit Fields').item.json.type_field }}",
+                    "rightValue": "application/pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3a1696d1-00d1-4b60-b7d8-7dacfd1d18e4"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "PDF"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "49d529eb-f7c1-4fb3-9a46-163482e2337a",
+                    "leftValue": "={{ $('Edit Fields').item.json.type_field }}",
+                    "rightValue": "application/vnd.google-apps.document",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "DOC"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ebbd48d1-aec7-4c96-b92f-781a06f78fc0",
+                    "leftValue": "={{ $('Edit Fields').item.json.type_field }}",
+                    "rightValue": "application/vnd.google-apps.spreadsheet",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "CSV"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -160,
+        -512
+      ],
+      "id": "47de51d7-0670-4797-a387-7c9d39c778e2",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        64,
+        -672
+      ],
+      "id": "2915b592-0086-442d-bc51-6488b5a4bd8a",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        64,
+        -288
+      ],
+      "id": "fa5c3009-a5ea-47d0-b75c-fff7329f7955",
+      "name": "Extract from File2"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        64,
+        -480
+      ],
+      "id": "2fa2d1b6-198d-4147-a361-3834f7cdbd16",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -1056,
+        -896
+      ],
+      "id": "8b9b5d50-294c-4d26-b6de-ba1dff0453ed",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        -832,
+        -896
+      ],
+      "id": "873df573-762c-4e70-9bf0-52a0866228b2",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "content": "In case we need to agregate in one item the data in a excell file",
+        "width": 448,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1120,
+        -896
+      ],
+      "id": "2b4cde32-c1dd-49ca-9b71-ebbe8632d42a",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {
+          "dimensions": 512
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -384,
+        800
+      ],
+      "id": "b517c4bf-18ef-4f91-abb0-2e609ff138e6",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "n0wfPgDwiY0nvtW8",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "e5f6e93f-48bf-4007-b98b-0e0bede4d99e",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1056,
+        368
+      ],
+      "id": "f1144625-227c-4e27-8fe8-95db31e36b22",
+      "name": "Webhook",
+      "webhookId": "e5f6e93f-48bf-4007-b98b-0e0bede4d99e"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -208,
+        368
+      ],
+      "id": "8bcdbf86-3ff3-4d35-aac4-13b1e600d1a6",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "turbousdassistant",
+          "mode": "list",
+          "cachedResultName": "turbousdassistant"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        288,
+        -480
+      ],
+      "id": "89673f6f-61e2-47b2-92d8-61cf27398a5a",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "x9leVDjMR9cJQbeW",
+          "name": "Base_Vectorial_PineCone"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "dimensions": 512
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        296,
+        -256
+      ],
+      "id": "12057b98-64a4-4079-82ea-7590a358eed2",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "n0wfPgDwiY0nvtW8",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        424,
+        -256
+      ],
+      "id": "f1c7e61e-9a09-4fb6-b898-a58f23934a03",
+      "name": "Default Data Loader2"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Es una herramienta que se encarga de obtener información y alimentar al agente para que pueda responder las preguntas del usuario con mas precisión.",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "turbousdassistant",
+          "mode": "list",
+          "cachedResultName": "turbousdassistant"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -464,
+        592
+      ],
+      "id": "f6fac3fc-7b75-487a-9dcb-9dfe398e440a",
+      "name": "Pinecone Vector Store1",
+      "credentials": {
+        "pineconeApi": {
+          "id": "x9leVDjMR9cJQbeW",
+          "name": "Base_Vectorial_PineCone"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "content-type": "application/json",
+            "user-agent": "PostmanRuntime/7.49.1",
+            "accept": "*/*",
+            "postman-token": "94a08c0e-4f2d-488c-acbc-50e208613200",
+            "host": "localhost:5678",
+            "accept-encoding": "gzip, deflate, br",
+            "connection": "keep-alive",
+            "content-length": "118"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "mensaje": "me llamo mariano, quiero comprar cripto y soy totalmente nuevo. Dime que pasos tengo que seguir"
+          },
+          "webhookUrl": "http://localhost:5678/webhook-test/e5f6e93f-48bf-4007-b98b-0e0bede4d99e",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When chat message received": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Archivo_Creado": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Archivo_Actualizado": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Delete a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a row": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract from File2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File2": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader2": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3a7f91f0-593b-4439-8a6d-71d5b195b166",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "50e908245cf6cca64bb82f82936896e49b0c1624b5b3352ac4dfa73bc56481dc"
+  },
+  "id": "9rjizHRITxfrVlCF",
+  "tags": []
+}

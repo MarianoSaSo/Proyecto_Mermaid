@@ -1,0 +1,443 @@
+{
+  "name": "email_response",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -400,
+        -96
+      ],
+      "id": "6682df5e-4c2d-414e-97c4-9e44cd92170b",
+      "name": "Gmail Trigger",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "D4cEbuX1DCtVGiuy",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "=El usuario que envia el email es  {{ $json.from.value[0].name }} y esta es su direccion de correo electronico {{ $json.from.value[0].address }}. El asunto del email es {{ $json.subject }} y el cuerpo del email es {{ $json.text }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Nombre",
+              "description": "El nombre del usuario",
+              "required": true
+            },
+            {
+              "name": "Telefono",
+              "description": "El telefono del usuario",
+              "required": true
+            },
+            {
+              "name": "email",
+              "description": "El email del usuario",
+              "required": true
+            },
+            {
+              "name": "Descripcion",
+              "description": "Servicio que necesita o solicita el usuario"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        -144,
+        -96
+      ],
+      "id": "1b7280fc-08d5-481d-acd7-dc10e1b4e333",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -144,
+        128
+      ],
+      "id": "c76c9d30-3167-4a32-b1bd-a0c414b4689a",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "n0wfPgDwiY0nvtW8",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Wexo4-hWqWozT_2Yjz24fq6w_uHs-9h-FMoIcAUT3Ig",
+          "mode": "list",
+          "cachedResultName": "users",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wexo4-hWqWozT_2Yjz24fq6w_uHs-9h-FMoIcAUT3Ig/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wexo4-hWqWozT_2Yjz24fq6w_uHs-9h-FMoIcAUT3Ig/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nombre": "={{ $json.output.Nombre }}",
+            "email": "={{ $json.output.email }}",
+            "Teléfono": "={{ $json.output.Telefono }}",
+            "Descripcion": "={{ $json.output.Descripcion }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Nombre",
+              "displayName": "Nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Teléfono",
+              "displayName": "Teléfono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Descripcion",
+              "displayName": "Descripcion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        784,
+        -80
+      ],
+      "id": "231a9133-c3f6-4384-8052-70007e004c2b",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q1fI1ifbrdVgFTRm",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7f5c6df0-e256-4fad-9df9-2fa2427204ae",
+              "leftValue": "={{ $json.output.Telefono }}",
+              "rightValue": "+",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        -96
+      ],
+      "id": "4b3d1918-195c-496d-951d-29637a77df58",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Procesa cada item de entrada\nfor (const item of $input.all()) {\n\n  // Asegura que output y telefono existen\n  if (item.json.output && item.json.output.Telefono) {\n\n    // Quitar solo el \"+\"\n    item.json.output.Telefono = item.json.output.Telefono.replace(\"+\", \"\");\n\n    // O si quieres quitar cualquier cosa que no sea número:\n    // item.json.output.Telefono = item.json.output.Telefono.replace(/\\D/g, \"\");\n  }\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        -240
+      ],
+      "id": "441ebc1b-45df-4703-b457-22cf80316d4b",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        -80
+      ],
+      "id": "e9ceb774-e805-4580-ae60-152beae6c622",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Responde al siguiente mensaje recibido por el usuario.\n\nEl nombre del usuario es:  {{ $json.data[0].Nombre }}\n\nSu email es: {{ $json.data[0].email }}\n\nSu telefono es: {{ $json.data[0]['Teléfono'] }}\n\nEl cuerpo de su mensaje es: {{ $json.data[0].Descripcion }}\n\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Eres el asistente virtual de Mermaid AI, empresa especializada en automatizaciones avanzadas y agentes de inteligencia artificial.\n\nTu función es responder de forma profesional a las consultas de usuarios interesados en nuestros servicios.\n\nServicios disponibles:\n\nAgente de voz: 2.000 €\n\nAgente de WhatsApp: 1.500 €\n\nAutomatización de facturas: 1.800 €\n\nConsultoría de IA: 150 €\n\nTu respuesta debe ser exclusivamente un correo electrónico, sin asunto y sin añadir información adicional que no haya solicitado el usuario.\n\nFinaliza siempre el correo con:\n\nUn saludo\nManiek S\n\nFecha y hora actual: {{ $now }}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        1264,
+        -80
+      ],
+      "id": "669c1dca-343e-4e92-abdb-ebfe3db5e48a",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1200,
+        128
+      ],
+      "id": "7c3b5e80-ff64-4b68-b012-a5e0915a52dc",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "n0wfPgDwiY0nvtW8",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1616,
+        -80
+      ],
+      "id": "9b1f6a78-cfa0-4412-9b5a-542fd1f7a1a3",
+      "name": "Reply to a message",
+      "webhookId": "123d7dcc-79b0-427a-adad-340880630f16",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "D4cEbuX1DCtVGiuy",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Information Extractor": [
+      {
+        "json": {
+          "output": {
+            "Nombre": "Mariano Saez",
+            "Telefono": "23 645 33 87 96",
+            "email": "mariano.saesor@gmail.com",
+            "Descripcion": "Estoy interesado en la nueva propuesta para tener un agente de ia conectado a mi email"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0a1eb8e7-cdf4-4dd0-9489-f8644dddee85",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "50e908245cf6cca64bb82f82936896e49b0c1624b5b3352ac4dfa73bc56481dc"
+  },
+  "id": "FPA0NgqIOYHKwWwA",
+  "tags": []
+}

@@ -1,0 +1,217 @@
+{
+  "name": "Gmail RAG_Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -704,
+        -240
+      ],
+      "id": "ba806a97-26c5-424c-a5aa-6a4bd9b04c6b",
+      "name": "When chat message received",
+      "webhookId": "d06ea120-6ea4-48eb-b9c1-dc212bdda654"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "Eres un Agente especializado en redactar y preparar emails para enviar.\nTu función es conversar con el usuario de manera guiada para obtener la información necesaria y, una vez reunida, generar un email completo, bien escrito y listo para enviar.\n\nComportamiento del agente:\n\nPreséntate siempre al inicio como:\n“Hola, soy tu Agente de Envío de Emails. Estoy aquí para ayudarte a redactar el correo perfecto.”\n\nPrimero, solicita la dirección de correo electrónico del destinatario.\nSi el usuario no la proporciona, vuelve a pedirla de forma amable.\n\nCuando tengas la dirección, solicita el contenido del email que desea enviar el usuario.\nPuede ser un mensaje breve, ideas sueltas o instrucciones; tú transformarás esa información en un email profesional.\n\nCuando ya tengas:\n\nla dirección de correo\n\ny el contenido del mensaje\n\nEntonces redactarás un email completo, con buena estructura y formato claro.\n\nAntes de enviarlo tienes que mostrarle la version del email que has redactado y esperar a que el usuario te confirme o te diga si es necesario cambiar algo\n\nReglas al redactar el email final:\n\nUsa párrafos separados, nunca un bloque de texto seguido.\n\nIncluye:\n\nSaludo\n\nIntroducción breve\n\nDesarrollo principal\n\nCierre profesional y amable\n\nAjusta el tono al estilo del usuario (formal, informal, técnico, amistoso…).\n\nNo incluyas explicaciones sobre tu proceso, solo entrega el email listo.\n\nNo inventes datos que el usuario no haya proporcionado.\n\nEjemplo de email del estilo esperado (NO lo copies literalmente):\n\nHola Laura,\n\nEspero que estés muy bien. Te escribo para darte la información que comentaste en nuestra conversación anterior. He preparado los detalles para que puedas revisarlos con calma cuando tengas tiempo.\n\nSi necesitas que añada más datos o deseas realizar algún ajuste, estaré encantado de ayudarte.\n\nUn saludo cordial,\nTu asistente"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -48,
+        -64
+      ],
+      "id": "c35682c9-1099-4e7b-b9a3-3bc55c93e390",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -192,
+        160
+      ],
+      "id": "a054507b-1254-472e-8b05-7e3f402c011e",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "FlqQoRxIgWMcrV57",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        256,
+        160
+      ],
+      "id": "d91c6599-d854-4bef-af1c-6ce8b6d8fdd5",
+      "name": "Gmail",
+      "webhookId": "83ba2d5b-912a-487c-8ac7-220dc29d4c47",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "N1z1pkS7BLpMT2xW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -304,
+        -64
+      ],
+      "id": "f9117684-ac78-4c8d-907d-62ad73762dfb",
+      "name": "Telegram Trigger",
+      "webhookId": "d21af652-f389-49b4-a4f0-14bcf827abf2",
+      "credentials": {
+        "telegramApi": {
+          "id": "azSbS95qamuNKAJu",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -48,
+        144
+      ],
+      "id": "aaeb9b15-8d26-418b-949a-3c1cfcdfb95b",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        304,
+        -64
+      ],
+      "id": "e09f4263-543d-42d8-986a-8e0feb6296e5",
+      "name": "Send a text message",
+      "webhookId": "0ede76c9-45ad-45d7-b77d-9f83baa26d86",
+      "credentials": {
+        "telegramApi": {
+          "id": "azSbS95qamuNKAJu",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4fc5f862-80ee-4255-a678-a74fa576d748",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "270d7de402522376d919cc839010a9ff4ff124d265120378ad91954c359f5497"
+  },
+  "id": "MKwEyWVH1EvWLfgi",
+  "tags": []
+}

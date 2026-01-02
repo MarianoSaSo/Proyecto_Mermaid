@@ -1,0 +1,276 @@
+{
+  "name": "My workflow 6",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "accessToken",
+        "resource": "product",
+        "operation": "getAll",
+        "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
+        "additionalFields": {
+          "created_at_max": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Created_At_Max', ``, 'string') }}",
+          "created_at_min": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Created_At_Min', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.shopifyTool",
+      "typeVersion": 1,
+      "position": [
+        12560,
+        4200
+      ],
+      "id": "379732f2-4638-4474-abea-9126e1553700",
+      "name": "Shopify - Revisar productos",
+      "credentials": {
+        "shopifyAccessTokenApi": {
+          "id": "tEZnd6FoJBR6SQqb",
+          "name": "Shopify Access Token account - Curso Adri"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Solamente utiliza esta herramienta cuando hayas comprobado el pago y el pago esté COMPLETADO",
+        "authentication": "accessToken",
+        "additionalFields": {
+          "shippingAddressUi": {
+            "shippingAddressValues": {
+              "firstName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('First_Name', ``, 'string') }}",
+              "lastName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Last_Name', ``, 'string') }}",
+              "company": "=",
+              "country": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Country', ``, 'string') }}",
+              "address1": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Address_Line_1', ``, 'string') }}",
+              "address2": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Address_Line_2', ``, 'string') }}",
+              "city": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('City', ``, 'string') }}",
+              "province": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Province', ``, 'string') }}",
+              "zip": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Zip_Code', ``, 'string') }}",
+              "phone": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone', ``, 'string') }}"
+            }
+          }
+        },
+        "limeItemsUi": {
+          "lineItemValues": [
+            {
+              "productId": "={{ $fromAI('productid', ``, 'string') }}",
+              "variantId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Variant_ID', ``, 'string') }}",
+              "title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Title', ``, 'string') }}",
+              "grams": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Grams', ``, 'string') }}",
+              "quantity": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Quantity', ``, 'number') }}",
+              "price": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Price', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.shopifyTool",
+      "typeVersion": 1,
+      "position": [
+        12420,
+        4200
+      ],
+      "id": "d9b5f975-ad58-4166-a640-6a8602dc68b5",
+      "name": "Shopify - Crear pedido",
+      "credentials": {
+        "shopifyAccessTokenApi": {
+          "id": "tEZnd6FoJBR6SQqb",
+          "name": "Shopify Access Token account - Curso Adri"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "accessToken",
+        "operation": "update",
+        "orderId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Order_ID', ``, 'string') }}",
+        "updateFields": {}
+      },
+      "type": "n8n-nodes-base.shopifyTool",
+      "typeVersion": 1,
+      "position": [
+        12280,
+        4200
+      ],
+      "id": "a606561e-301e-45f9-af9e-3b85fb7a9c38",
+      "name": "Shopify - Actualizar pedido",
+      "credentials": {
+        "shopifyAccessTokenApi": {
+          "id": "tEZnd6FoJBR6SQqb",
+          "name": "Shopify Access Token account - Curso Adri"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "accessToken",
+        "operation": "getAll",
+        "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
+        "options": {
+          "createdAtMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Created_At_Min', ``, 'string') }}",
+          "createdAtMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Created_At_Max', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.shopifyTool",
+      "typeVersion": 1,
+      "position": [
+        12120,
+        4200
+      ],
+      "id": "1c1735ab-6ac9-4d4a-96ec-7a74b1f1e1f4",
+      "name": "Shopify - Comprobar pedidos",
+      "credentials": {
+        "shopifyAccessTokenApi": {
+          "id": "tEZnd6FoJBR6SQqb",
+          "name": "Shopify Access Token account - Curso Adri"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Utiliza esta herramienta para actualizar informaciónd e los productos",
+        "authentication": "accessToken",
+        "resource": "product",
+        "operation": "update",
+        "productId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Product_ID', ``, 'string') }}",
+        "updateFields": {
+          "title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Title', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.shopifyTool",
+      "typeVersion": 1,
+      "position": [
+        12720,
+        4200
+      ],
+      "id": "2b46bd0c-efbc-45a0-8a75-f7503d8c5875",
+      "name": "Shopify - Actualizar productos",
+      "credentials": {
+        "shopifyAccessTokenApi": {
+          "id": "tEZnd6FoJBR6SQqb",
+          "name": "Shopify Access Token account - Curso Adri"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "455ca8a9-12a3-428b-941e-e44347261544"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 1,
+      "position": [
+        11980,
+        3920
+      ],
+      "id": "c4e4a3db-fe00-4fbd-8a6f-2521ba65e44f",
+      "name": "MCP Server Trigger",
+      "webhookId": "455ca8a9-12a3-428b-941e-e44347261544"
+    },
+    {
+      "parameters": {
+        "content": "# 🚀 La Tribu Divisual\n\n## Accede a **La Tribu Divisual** para aprender a crear agentes más avanzados y a generar altos ingresos con ellos de forma real y segura.\n\n# 👉 [Click aquí para unirte a la Lista de espera](https://divisualproject.academy/)\n",
+        "height": 280,
+        "width": 760,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        12300,
+        3780
+      ],
+      "id": "17e04c45-07c6-47c2-88c2-7d5c4d802830",
+      "name": "Sticky Note10"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Generador de video": {
+      "main": [
+        [
+          {
+            "node": "30 Seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shopify - Comprobar pedidos": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shopify - Actualizar pedido": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shopify - Crear pedido": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shopify - Revisar productos": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shopify - Actualizar productos": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "80c352d6-43a7-4909-8d28-c981ed3d2c16",
+  "meta": {
+    "instanceId": "2723e5c0cdf73e609a9d6131a4145b2656ca7463c71fa761a441dc255964ffd8"
+  },
+  "id": "JgLJz456oriiL7W9",
+  "tags": [
+    {
+      "createdAt": "2025-05-13T08:00:58.464Z",
+      "updatedAt": "2025-05-13T08:00:58.464Z",
+      "id": "IxHXOpyTZspV9j2o",
+      "name": "La Tribu Divisual"
+    },
+    {
+      "createdAt": "2025-06-01T18:57:05.689Z",
+      "updatedAt": "2025-06-01T18:57:05.689Z",
+      "id": "uhDg4e01CCZHetVc",
+      "name": "Curso Adrián Sáenz"
+    }
+  ]
+}

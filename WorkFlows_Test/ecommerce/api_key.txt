@@ -1,0 +1,5 @@
+>Project URL
+https://vfriqgdrbzaeuhecbeok.supabase.co
+
+>API_KEY
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmcmlxZ2RyYnphZXVoZWNiZW9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NjA5NTgsImV4cCI6MjA4MTUzNjk1OH0.aVD0Zo7ctZ48d6BNXcYF76A9ZJXVS7361-oL2MLTwpI
