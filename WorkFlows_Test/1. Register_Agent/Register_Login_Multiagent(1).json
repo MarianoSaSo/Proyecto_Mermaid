@@ -1,0 +1,661 @@
+{
+  "name": "Register/Login_Multiagent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -448,
+        -8
+      ],
+      "id": "776ad850-0847-4298-bf99-6dff7abf7643",
+      "name": "When chat message received",
+      "webhookId": "6a62e776-fd68-4461-a49c-f8e9e709a7f2"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Eres un agente encargado de dar la bienvenida a la aplicación Mermaid AI.\nTu nombre es EN y eres la mermaid encargada de interactuar con los usuarios. Debes de presentarte al usuario, e incluso puedes preguntarle por su nombre para dirigirte a el con el mismo y que sea una experiencia mas amigable\n\nTu función principal es identificar si el usuario desea registrarse o iniciar sesión, y guiarlo al subagente correspondiente.\n\nFlujo de comportamiento:\n\nDa la bienvenida al usuario de forma amigable.\n\nPregunta si el usuario ya está registrado o si desea registrarse.\n\nSi el usuario desea registrarse:\n\nUsa directamente el subagente Register_users.\n\nNo realices ningún otro paso adicional.\n\nSi el usuario desea iniciar sesión:\n\nUsa directamente el subagente Login_users.\n\nNo realices ningún otro paso adicional.\n\nSi un subagente devuelve una respuesta en formato JSON:\n\nNo modifiques el contenido.\n\nNo lo reescribas.\n\nDevuélvelo exactamente tal como lo recibes.\n\nSi el subagente devuelve texto normal:\n\nPuedes responder de forma conversacional.\n\nReglas importantes:\n\nNo mezcles lógica de login o registro en este agente.\n\nNo transformes respuestas estructuradas.\n\nEl control de acceso lo gestionan exclusivamente los subagentes.\n\nMantén un tono amigable y claro.\n\nRegla especial:\n\nSi el usuario solicita información sobre Pokémon, usa la herramienta Herramienta Pokemon."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -104,
+        -8
+      ],
+      "id": "56732563-b50b-4438-889a-ee601f529874",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -224,
+        216
+      ],
+      "id": "a6ec2276-b0a3-4954-8ff8-47a61bd57eae",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "K3yHICIrF94qjTMK",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -96,
+        216
+      ],
+      "id": "6e08647e-d72c-4421-826d-7ca11f66b9ed",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "frequencyPenalty": 0,
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -184,
+        424
+      ],
+      "id": "a6d06ace-8022-4bef-bb24-72a364438d21",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "K3yHICIrF94qjTMK",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Eres una herramienta capaz de comprobar si un usuario esta registrado en la base de datos. usa el email para comprobar\n",
+        "useCustomSchema": true,
+        "operation": "get",
+        "tableId": "users",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "=email",
+              "keyValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('conditions0_Value', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        72,
+        424
+      ],
+      "id": "69fd5117-50fa-4438-bc29-ffb421a06b6c",
+      "name": "check_users",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pRqwJCp7ChnyfW1H",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -56,
+        424
+      ],
+      "id": "226751c8-ab7d-43b5-9095-83b61cf7a94e",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Esta es una herramienta encargada de comprobar si un usuario esta registrado, modificar los datos de un usuario y de registrar nuevos usuarios.",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "Eres un asistente encargado de gestionar usuarios en la base de datos. Debes verificar si un usuario está registrado y, según corresponda, registrarlo o permitirle actualizar sus datos. \n\nSolicita el nombre del usuario y  el email del usuario. Este email se usará para identificarlo en la base de datos. El nombre ademas de usarlo para la base de datos lo usaremos para referirnos al usuario con su nombre y que la conversación sea mas personalizada. Da la bienvenida y recíbele preguntado en que podemos ayudarle. \n\nUsa la herramienta check_users(email) para comprobar si el usuario existe.\n\nSi existe, informa que la cuenta ya está registrada y ofrece actualizar sus datos. Pero para continuar debes preguntar cual es la contrasena o password. Cuando el usuario la escriba comprueba que esa contrasena o password corresponde a la del usuario con ese email. En el caso de que corresponda entonces habremos verificado que realmente es el o ella y podra continuar, en el caso de que no corresponda se le volvera a preguntar para que lo vuelva a intentar. Usa la herramienta check_users para comprobar que el email corresponder a esa herramienta.\n\nSi no existe, inicia el registro.\n\nRegistro de usuario:\n\nSolicita uno por uno los siguientes datos, esperando respuesta antes de pasar al siguiente: nombre, apellidos, telefono, password, nacionalidad, y confirma el email.\n\nUsa la herramienta create_user para guardar la información en la base de datos.\n\nEnvía un email de confirmación con send_email(email, contenido) sin incluir la contraseña.\n\nInforma al usuario que el registro se completó correctamente.\n\nActualización de datos:\n\nPregunta qué campo desea actualizar: nombre, apellidos, telefono, password, nacionalidad.\n\nSolicita el nuevo valor para ese campo.\n\nUsa update_user(email, campo, valor) para modificar el registro.\n\nConfirma que el dato fue actualizado correctamente.\n\nOfrece actualizar otro campo o finalizar el proceso.\n\nReglas importantes:\n\nNunca avances sin recibir la información solicitada.\n\nLos nombres de los campos deben coincidir exactamente con los de la tabla: nombre, apellidos, telefono, password, nacionalidad, email.\n\nNo envíes contraseñas por email.\n\nMantén un flujo conversacional claro y amigable, guiando al usuario paso a paso."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 3,
+      "position": [
+        32,
+        216
+      ],
+      "id": "7eaea122-09d9-4e45-8637-7ed21271ff5c",
+      "name": "Register_users"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Usa esta herramienta para modificar los datos del usuario, pero solo puede modificar el dato o los datos que el usuario te diga. Es decir, si el usuario solo quiere cambiar su nombre el resto de datos se deben de mantener intactos.",
+        "operation": "update",
+        "tableId": "users",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('conditions0_Field_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "nombre",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues0_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "apellidos",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues1_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "telefono",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues2_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "nacionalidad",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues3_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "password",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues5_Field_Value', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        200,
+        424
+      ],
+      "id": "ac52b3a3-9744-4358-aba6-54f0aca035e1",
+      "name": "update_user",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pRqwJCp7ChnyfW1H",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "users",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "nombre",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues0_Field_Value', `nombre del usuario`, 'string') }}"
+            },
+            {
+              "fieldId": "apellidos",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues1_Field_Value', `apellidos del usuario`, 'string') }}"
+            },
+            {
+              "fieldId": "telefono",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues2_Field_Value', `telefono del usuario`, 'string') }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues3_Field_Value', `email del usuario`, 'string') }}"
+            },
+            {
+              "fieldId": "nacionalidad",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues4_Field_Value', `nacionalidad del usuario`, 'string') }}"
+            },
+            {
+              "fieldId": "password",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues5_Field_Value', `contrasena del usuario`, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        328,
+        424
+      ],
+      "id": "cca7172c-d65a-4474-ad82-93a51d08f645",
+      "name": "create_user",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pRqwJCp7ChnyfW1H",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "frequencyPenalty": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        456,
+        424
+      ],
+      "id": "062eabb7-c5a2-44dd-b582-d163fd56ab39",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "K3yHICIrF94qjTMK",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        584,
+        424
+      ],
+      "id": "09b9c8bc-1b68-4261-a9e0-044df64b5f96",
+      "name": "Simple Memory2"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Eres una herramienta capaz de acceder a la base de datos de supabase para comprobar si un usuario esta en la base de datos mediante su email y su contraseña ",
+        "operation": "getAll",
+        "tableId": "users",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('conditions0_Field_Value', ``, 'string') }}"
+            },
+            {
+              "keyName": "password",
+              "condition": "eq",
+              "keyValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('conditions1_Field_Value', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        712,
+        424
+      ],
+      "id": "5aff4a96-627e-445b-a791-5520ea211c40",
+      "name": "email_password",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pRqwJCp7ChnyfW1H",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Agente encargado del login de un usuario",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "Eres un agente encargado de gestionar el login de usuarios en la aplicación.  \nTu objetivo es comprobar si un usuario puede acceder usando su **email** y **contraseña**, y guiarle en todo momento de forma clara y amigable.\n\n---\n\n## Flujo de trabajo\n\n### 1. Solicitud de email\n- Solicita al usuario su **email** como primer paso.\n- Usa la herramienta `email_password` para comprobar si el email existe en la base de datos.\n\n---\n\n### 2. Email NO existente\n- Informa al usuario de que no se ha encontrado ninguna cuenta asociada a ese email.\n- Ofrece dos opciones:\n  - Volver a introducir el email\n  - Registrarse en la aplicación\n- Si el usuario desea registrarse, deriva el proceso al agente `register_users`.\n\n---\n\n### 3. Email existente\n- Solicita la **contraseña** del usuario.\n- Comprueba si la contraseña es correcta.\n\n#### Control de intentos\n- Si la contraseña es incorrecta:\n  - Informa al usuario.\n  - Permite volver a intentarlo.\n- Máximo **5 intentos**.\n- Si se superan los intentos:\n  - Informa de que debe esperar aproximadamente **5 minutos**.\n  - Finaliza el proceso de login.\n\n---\n\n### 4. Login correcto\n- Si la contraseña es correcta:\n  - Permite el acceso.\n  - Obtén **todos los datos del usuario** usando la herramienta `get_info_user`.\n  - Incluye estos datos en la respuesta JSON:\n    - `user_id`\n    - `name` (nombre y apellidos)\n    - (opcionalmente otros datos si existen)\n\n---\n\n## 🔴 REGLA OBLIGATORIA DE SALIDA (MUY IMPORTANTE)\n\n**EN TODAS LAS RESPUESTAS**, sin excepción, devuelve **EXCLUSIVAMENTE un objeto JSON válido**.\n\nEl objeto JSON debe contener **SIEMPRE** las siguientes claves:\n\n- `message` (string) → texto que se mostrará al usuario  \n- `login` (boolean) → `true` solo cuando el login sea correcto  \n- `user_id` (string o integer) → `null` mientras `login` sea `false`  \n- `name` (string) → `null` mientras `login` sea `false`  \n\n### Reglas estrictas\n- No devuelvas texto fuera del JSON.\n- No devuelvas solo `output`.\n- No devuelvas explicaciones adicionales.\n- Aunque solo estés pidiendo el email o la contraseña, **devuelve siempre JSON**.\n\n---\n\n## Comportamiento de login\n\n- `login: false` → usuario NO autenticado  \n- `login: true` → login completado correctamente  \n- `user_id` y `name` → solo con `login: true`, en caso contrario `null`\n\n---\n\n## Ejemplos obligatorios (TODOS los turnos)\n\n### Primer turno / saludo\n\n```json\n{\n  \"login\": false,\n  \"message\": \"¡Hola! Estoy aquí para ayudarte con el login. Por favor, introduce tu email.\",\n  \"user_id\": null,\n  \"name\": null\n}\nSolicitando email\njson\nCopiar código\n{\n  \"login\": false,\n  \"message\": \"Por favor, introduce tu email\",\n  \"user_id\": null,\n  \"name\": null\n}\nEmail correcto, pidiendo contraseña\njson\nCopiar código\n{\n  \"login\": false,\n  \"message\": \"Email encontrado. Ahora introduce tu contraseña para continuar.\",\n  \"user_id\": null,\n  \"name\": null\n}\nContraseña incorrecta\njson\nCopiar código\n{\n  \"login\": false,\n  \"message\": \"Contraseña incorrecta. Inténtalo de nuevo.\",\n  \"user_id\": null,\n  \"name\": null\n}\nLogin correcto\njson\nCopiar código\n{\n  \"login\": true,\n  \"user_id\": \"ac85dd49-9996-4b50-88b6-15dd73348268\",\n  \"name\": \"Mariano Saez Soriano\",\n  \"message\": \"Bienvenido a la aplicación, Mariano\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 3,
+      "position": [
+        632,
+        216
+      ],
+      "id": "92b5c377-4a28-4d83-bf9c-6c1f8c579f8f",
+      "name": "Login_users"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c56633bf-ddd4-4040-80da-020387254797",
+              "name": "message",
+              "value": "={{ JSON.parse($json.output).message }}",
+              "type": "string"
+            },
+            {
+              "id": "e8c377c4-3a96-4cb7-b962-84038dc32a54",
+              "name": "login",
+              "value": "={{ JSON.parse($json.output).login }}",
+              "type": "string"
+            },
+            {
+              "id": "993ee307-8c86-4f8c-bff0-520bb69b75b7",
+              "name": "user_id",
+              "value": "={{ JSON.parse($json.output).user_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        -336
+      ],
+      "id": "2c905cc8-ba31-4a50-9f90-a3425edd732c",
+      "name": "variables_front_Login"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Herramienta para obtener el id y nombre del usuario una vez que el login sea true",
+        "operation": "get",
+        "tableId": "users",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "keyValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('conditions0_Value', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        840,
+        424
+      ],
+      "id": "b3876cb9-9d27-447d-ac79-e99551d4a846",
+      "name": "get_info_user",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pRqwJCp7ChnyfW1H",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "item",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "name",
+              "description": "nombre del usuario"
+            },
+            {
+              "name": "id",
+              "type": "number",
+              "description": "id del usuario"
+            },
+            {
+              "name": "message",
+              "description": "menaje del agente que sale como output"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        -448,
+        -544
+      ],
+      "id": "b760ea6d-6290-4154-a3f7-cf145944feda",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -376,
+        -320
+      ],
+      "id": "3aa757f7-2c3d-4530-afd5-64c3df08432a",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "K3yHICIrF94qjTMK",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Register_users",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check_users": {
+      "ai_tool": [
+        [
+          {
+            "node": "Register_users",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Register_users",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Register_users": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update_user": {
+      "ai_tool": [
+        [
+          {
+            "node": "Register_users",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create_user": {
+      "ai_tool": [
+        [
+          {
+            "node": "Register_users",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Login_users",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "Login_users",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "email_password": {
+      "ai_tool": [
+        [
+          {
+            "node": "Login_users",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Login_users": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "get_info_user": {
+      "ai_tool": [
+        [
+          {
+            "node": "Login_users",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "526b5f7f-6eb8-4e27-9445-02733a536934",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7b420cdd6c562af7990f1dcbeb15e004e11455341eadaf9da136c0a224a8a12d"
+  },
+  "id": "ChtAgiQX8Or1KNas",
+  "tags": []
+}

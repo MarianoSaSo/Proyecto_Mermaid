@@ -1,0 +1,42 @@
+# supBas(mermaid)
+Cuco_Mermaid123
+
+#Crear table
+create table public.users (
+  id uuid primary key default gen_random_uuid(),
+  nombre text not null,
+  apellidos text not null,
+  telefono text,
+  email text unique not null,
+  nacionalidad text,
+  conectado boolean default false,
+  codigo_verificacion text,
+  password text not null,
+  created_at timestamp with time zone default now()
+);
+
+### uuid >> Significa Universally Unique Identifier (Identificador Único Universal).
+Es un número único a nivel mundial, casi imposible de repetir
+Se usa mucho para identificar registros sin depender de números consecutivos
+
+Ejemplo de un UUID:
+
+#Insertar usuarios de prueba
+insert into public.users (
+  nombre, apellidos, telefono, email, nacionalidad, conectado, codigo_verificacion, password
+) values
+('Ana', 'Pérez', '600111222', 'ana.perez@example.com', 'España', false, null, '1234'),
+('Luis', 'García', '600222333', 'luis.garcia@example.com', 'México', false, null, '1234'),
+('María', 'Rodríguez', '600333444', 'maria.rodriguez@example.com', 'Argentina', false, null, '1234'),
+('Carlos', 'López', '600444555', 'carlos.lopez@example.com', 'Chile', false, null, '1234'),
+('Sofía', 'Martínez', '600555666', 'sofia.martinez@example.com', 'Perú', false, null, '1234'),
+('Javier', 'Gómez', '600666777', 'javier.gomez@example.com', 'Colombia', false, null, '1234'),
+('Lucía', 'Hernández', '600777888', 'lucia.hernandez@example.com', 'Uruguay', false, null, '1234'),
+('Miguel', 'Díaz', '600888999', 'miguel.diaz@example.com', 'España', false, null, '1234'),
+('Isabel', 'Santos', '600999000', 'isabel.santos@example.com', 'México', false, null, '1234'),
+('Pedro', 'Ramírez', '601000111', 'pedro.ramirez@example.com', 'Argentina', false, null, '1234');
+
+#Comprobar usuarios
+select * from public.users;
+
+
