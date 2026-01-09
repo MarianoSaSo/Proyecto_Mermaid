@@ -3,6 +3,8 @@
   "nodes": [
     {
       "parameters": {
+        "public": true,
+        "mode": "webhook",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
@@ -83,7 +85,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        264,
+        272,
         1296
       ],
       "id": "ccd6c610-1d1e-4a21-b1f8-196f64f024c3",
@@ -114,7 +116,7 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        520,
+        528,
         1296
       ],
       "id": "75979a18-1979-4fab-888c-21ff134c7fb5",
@@ -131,7 +133,7 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        392,
+        400,
         1296
       ],
       "id": "45e10200-7037-4640-b681-ffd08014aaaf",
@@ -189,7 +191,7 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        648,
+        656,
         1296
       ],
       "id": "f0e7ca61-629f-48e0-a26c-35142883ef7c",
@@ -216,7 +218,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        1288,
+        1296,
         1296
       ],
       "id": "2efa779b-4583-4f42-a377-9903c607d50e",
@@ -233,7 +235,7 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        1416,
+        1424,
         1296
       ],
       "id": "577fc39e-5ee7-46f4-8d3b-2eefa5cb5094",
@@ -263,7 +265,7 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        1544,
+        1552,
         1296
       ],
       "id": "6765b853-9d78-4671-b575-721e2fdd809c",
@@ -328,7 +330,7 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        1672,
+        1680,
         1296
       ],
       "id": "745557aa-0fe5-4002-a4e6-5d1076e1cf18",
@@ -366,7 +368,7 @@
       "typeVersion": 1.2,
       "position": [
         0,
-        328
+        336
       ],
       "id": "4fd27120-7cea-4024-8e7d-53a126089389",
       "name": "Information Extractor"
@@ -384,8 +386,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        72,
-        552
+        80,
+        560
       ],
       "id": "a5933f53-0761-4294-839f-066b3559f64e",
       "name": "OpenAI Chat Model3",
@@ -409,7 +411,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        904,
+        912,
         1296
       ],
       "id": "9cd436ab-4cbf-4b03-ba1b-83894b528280",
@@ -426,7 +428,7 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        1032,
+        1040,
         1296
       ],
       "id": "8751a898-70f2-489e-a7e8-fbb972e30c1a",
@@ -473,7 +475,7 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        1160,
+        1168,
         1296
       ],
       "id": "37905de1-bf32-410f-81ee-5c2db86ca67c",
@@ -496,7 +498,7 @@
       "type": "@n8n/n8n-nodes-langchain.agentTool",
       "typeVersion": 3,
       "position": [
-        1016,
+        1024,
         1088
       ],
       "id": "711f23c2-8257-4981-937d-dfa688d710a9",
@@ -537,7 +539,7 @@
         "toolDescription": "Agente encargado del login de un usuario",
         "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
         "options": {
-          "systemMessage": "Eres un agente encargado de gestionar el login de usuarios en la aplicación.  \nTu objetivo es comprobar si un usuario puede acceder usando su **email** y **contraseña**, y guiarle en todo momento de forma clara y amigable.\n\n---\n\n## Flujo de trabajo\n\n### 1. Solicitud de email\n- Solicita al usuario su **email** como primer paso.\n- Usa la herramienta `email_password` para comprobar si el email existe en la base de datos. En el caso de que exista debes de comprobar en la columna de conectado si esta logeado o no usando obligatoriamente la herramienta get_info_user. \n\nEn el caso de que ya sea true comunícale al usuario que ya esta conectado. Además puedes preguntarle si quiere continuar conectado o quiere desconectarse. \n\nOBLIGATORIO!! En el caso de que quiera desconectarse entonces usa la herramienta Update_Login para cambiar el campo de la columna conectado a false en la fila que corresponda a ese usuario teniendo en cuenta su Id.\n\nEn el caso de que no este conectado entonces continua con el proceso\n\n---\n\n### 2. Email NO existente\n- Informa al usuario de que no se ha encontrado ninguna cuenta asociada a ese email.\n- Ofrece dos opciones:\n  - Volver a introducir el email\n  - Registrarse en la aplicación\n- Si el usuario desea registrarse, deriva el proceso al agente `register_users`.\n\n---\n\n### 3. Email existente\n- Solicita la **contraseña** del usuario.\n- Comprueba si la contraseña es correcta.\n\n#### Control de intentos\n- Si la contraseña es incorrecta:\n  - Informa al usuario.\n  - Permite volver a intentarlo.\n- Máximo **5 intentos**.\n- Si se superan los intentos:\n  - Informa de que debe esperar aproximadamente **5 minutos**.\n  - Finaliza el proceso de login.\n\n---\n\n### 4. Login correcto\n- Si la contraseña es correcta:\n -OBLIGATORIO Y MUY IMPORTANTE Usa la herramienta Update_Login para en la base de datos cambiar a True en la columna conectado de ese usuario. Tienes que usar como condición el id del usuario y cambiar solo el valor de la columna conectado en el campo que corresponda al id del usuario.\n  - Permite el acceso.\n  - Obtén **todos los datos del usuario** usando la herramienta `get_info_user`.\n  - Incluye estos datos en la respuesta JSON:\n    - `user_id`\n    - `name` (nombre y apellidos)\n    - (opcionalmente otros datos si existen)\n\n---\n\n## 🔴 REGLA OBLIGATORIA DE SALIDA (MUY IMPORTANTE)\n\n**EN TODAS LAS RESPUESTAS**, sin excepción, devuelve **EXCLUSIVAMENTE un objeto JSON válido**.\n\nEl objeto JSON debe contener **SIEMPRE** las siguientes claves:\n\n- `message` (string) → texto que se mostrará al usuario  \n- `login` (boolean) → `true` solo cuando el login sea correcto  o `false` cuando el usuario no haya hecho un login aun\n- `user_id` (string o integer) → `null` mientras `login` sea `false`  \n- `name` (string) → `null` mientras `login` sea `false`  \n\n### Reglas estrictas\n- No devuelvas texto fuera del JSON.\n- No devuelvas solo `output`.\n- No devuelvas explicaciones adicionales.\n- Aunque solo estés pidiendo el email o la contraseña, **devuelve siempre JSON**.\n\n---\n\n## Comportamiento de login\n\n- `login: false` → usuario NO autenticado  \n- `login: true` → login completado correctamente  \n- `user_id` y `name` → solo con `login: true`, en caso contrario `null`\n\n---\n\n## Ejemplos obligatorios (TODOS los turnos)\n\n### Primer turno / saludo\n\n```json\n{\n  \"login\": false,\n  \"message\": \"¡Hola! Estoy aquí para ayudarte con el login. Por favor, introduce tu email.\",\n  \"user_id\": null,\n  \"name\": null\n}\nSolicitando email\njson\nCopiar código\n{\n  \"login\": false,\n  \"message\": \"Por favor, introduce tu email\",\n  \"user_id\": null,\n  \"name\": null\n}\nEmail correcto, pidiendo contraseña\njson\nCopiar código\n{\n  \"login\": false,\n  \"message\": \"Email encontrado. Ahora introduce tu contraseña para continuar.\",\n  \"user_id\": null,\n  \"name\": null\n}\nContraseña incorrecta\njson\nCopiar código\n{\n  \"login\": false,\n  \"message\": \"Contraseña incorrecta. Inténtalo de nuevo.\",\n  \"user_id\": null,\n  \"name\": null\n}\nLogin correcto\njson\nCopiar código\n{\n  \"login\": true,\n  \"user_id\": \"ac85dd49-9996-4b50-88b6-15dd73348268\",\n  \"name\": \"Mariano Saez Soriano\",\n  \"message\": \"Bienvenido a la aplicación, Mariano\"\n}"
+          "systemMessage": "Eres un agente encargado de gestionar el login de usuarios en la aplicación.  \nTu objetivo es comprobar si un usuario puede acceder usando su **email** y **contraseña**, y guiarle en todo momento de forma clara y amigable.\n\n---\n\n## Flujo de trabajo\n\n### 1. Solicitud de email\n- Solicita al usuario su **email** como primer paso.\n- Usa la herramienta `email_password` para comprobar si el email existe en la base de datos. En el caso de que exista debes de comprobar en la columna de conectado si esta logeado o no usando obligatoriamente la herramienta get_info_user. \n\nEn el caso de que ya sea true comunícale al usuario que ya esta conectado. Además puedes preguntarle si quiere continuar conectado o quiere desconectarse. \n\nOBLIGATORIO!! En el caso de que quiera desconectarse entonces usa la herramienta Update_Login para cambiar el campo de la columna conectado a FALSE en la fila que corresponda a ese usuario teniendo en cuenta su Id.\n\nEn el caso de que no este conectado entonces continua con el proceso\n\n---\n\n### 2. Email NO existente\n- Informa al usuario de que no se ha encontrado ninguna cuenta asociada a ese email.\n- Ofrece dos opciones:\n  - Volver a introducir el email\n  - Registrarse en la aplicación\n- Si el usuario desea registrarse, deriva el proceso al agente `register_users`.\n\n---\n\n### 3. Email existente\n- Solicita la **contraseña** del usuario.\n- Comprueba si la contraseña es correcta.\n\n#### Control de intentos\n- Si la contraseña es incorrecta:\n  - Informa al usuario.\n  - Permite volver a intentarlo.\n- Máximo **5 intentos**.\n- Si se superan los intentos:\n  - Informa de que debe esperar aproximadamente **5 minutos**.\n  - Finaliza el proceso de login.\n\n---\n\n### 4. Login correcto\n- Si la contraseña es correcta:\n -OBLIGATORIO Y MUY IMPORTANTE Usa la herramienta Update_Login para en la base de datos cambiar a True en la columna conectado de ese usuario. Tienes que usar como condición el id del usuario y cambiar solo el valor de la columna conectado en el campo que corresponda al id del usuario.\n  - Permite el acceso.\n  - Obtén **todos los datos del usuario** usando la herramienta `get_info_user`.\n  - Incluye estos datos en la respuesta JSON:\n    - `user_id`\n    - `name` (nombre y apellidos)\n    - (opcionalmente otros datos si existen)\n\n---\n\n## 🔴 REGLA OBLIGATORIA DE SALIDA (MUY IMPORTANTE)\n\n**EN TODAS LAS RESPUESTAS**, sin excepción, devuelve **EXCLUSIVAMENTE un objeto JSON válido**.\n\nEl objeto JSON debe contener **SIEMPRE** las siguientes claves:\n\n- `message` (string) → texto que se mostrará al usuario  \n- `login` (boolean) → `true` solo cuando el login sea correcto  o `false` cuando el usuario no haya hecho un login aun\n- `user_id` (string o integer) → `null` mientras `login` sea `false`  \n- `name` (string) → `null` mientras `login` sea `false`  \n\n### Reglas estrictas\n- No devuelvas texto fuera del JSON.\n- No devuelvas solo `output`.\n- No devuelvas explicaciones adicionales.\n- Aunque solo estés pidiendo el email o la contraseña, **devuelve siempre JSON**.\n\n---\n\n## Comportamiento de login\n\n- `login: false` → usuario NO autenticado  \n- `login: true` → login completado correctamente  \n- `user_id` y `name` → solo con `login: true`, en caso contrario `null`\n\n---\n\n## Ejemplos obligatorios (TODOS los turnos)\n\n### Primer turno / saludo\n\n```json\n{\n  \"login\": false,\n  \"message\": \"¡Hola! Estoy aquí para ayudarte con el login. Por favor, introduce tu email.\",\n  \"user_id\": null,\n  \"name\": null\n}\nSolicitando email\njson\nCopiar código\n{\n  \"login\": false,\n  \"message\": \"Por favor, introduce tu email\",\n  \"user_id\": null,\n  \"name\": null\n}\nEmail correcto, pidiendo contraseña\njson\nCopiar código\n{\n  \"login\": false,\n  \"message\": \"Email encontrado. Ahora introduce tu contraseña para continuar.\",\n  \"user_id\": null,\n  \"name\": null\n}\nContraseña incorrecta\njson\nCopiar código\n{\n  \"login\": false,\n  \"message\": \"Contraseña incorrecta. Inténtalo de nuevo.\",\n  \"user_id\": null,\n  \"name\": null\n}\nLogin correcto\njson\nCopiar código\n{\n  \"login\": true,\n  \"user_id\": \"ac85dd49-9996-4b50-88b6-15dd73348268\",\n  \"name\": \"Mariano Saez Soriano\",\n  \"message\": \"Bienvenido a la aplicación, Mariano\"\n}"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agentTool",
@@ -576,7 +578,7 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        1800,
+        1808,
         1296
       ],
       "id": "fef35ab9-3664-4305-be95-78d1511d3fd9",
@@ -599,7 +601,7 @@
       "type": "n8n-nodes-base.gmailTool",
       "typeVersion": 2.2,
       "position": [
-        776,
+        784,
         1296
       ],
       "id": "40b95475-193a-4808-8bcf-7c40845ef1ed",
@@ -619,25 +621,25 @@
             {
               "id": "f43be73f-0ea2-40c1-ba42-4f47715d34b9",
               "name": "message",
-              "value": "=={{ JSON.parse($json.output).message }}",
+              "value": "={{ JSON.parse($json.output.replace(/```json|```/g, '')).message }}",
               "type": "string"
             },
             {
               "id": "afd256e0-21c8-465c-907f-e9dbcb397d01",
               "name": "user_id",
-              "value": "=={{ JSON.parse($json.output).user_id }}",
+              "value": "={{ JSON.parse($json.output.replace(/```json|```/g, '')).user_id }}\n",
               "type": "string"
             },
             {
               "id": "2366dd25-3771-4b83-bdf4-1d75cdacf226",
               "name": "login",
-              "value": "=={{ JSON.parse($json.output).login }}",
+              "value": "={{ JSON.parse($json.output.replace(/```json|```/g, '')).login }}\n\n",
               "type": "string"
             },
             {
               "id": "47a304a6-bda9-4b38-8753-852dc0fd4d3c",
               "name": "name",
-              "value": "=={{ JSON.parse($json.output).name }}",
+              "value": "={{ JSON.parse($json.output.replace(/```json|```/g, '')).name }}",
               "type": "string"
             }
           ]
@@ -647,11 +649,11 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2008,
+        2016,
         864
       ],
       "id": "755a29fb-4aaf-427f-9459-3a3501cdc19b",
-      "name": "Edit Fields"
+      "name": "variables_chat_salida"
     }
   ],
   "pinData": {},
@@ -880,7 +882,7 @@
       "main": [
         [
           {
-            "node": "Edit Fields",
+            "node": "variables_chat_salida",
             "type": "main",
             "index": 0
           }
@@ -893,7 +895,7 @@
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "5a16663d-37ce-4dc1-958d-726e841e0be6",
+  "versionId": "d3424a38-c690-43e5-a129-baed32b1438d",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "50e908245cf6cca64bb82f82936896e49b0c1624b5b3352ac4dfa73bc56481dc"
