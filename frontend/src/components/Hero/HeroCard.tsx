@@ -1,21 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import "@n8n/chat/style.css";
-import { createChat } from "@n8n/chat";
+import HeroChat from "./HeroChat";
 
 export default function HeroCard() {
   const [loading, setLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showChat, setShowChat] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    createChat({
-      webhookUrl: "http://localhost:5678/webhook/6a62e776-fd68-4461-a49c-f8e9e709a7f2/chat", // TU URL REAL
-      target: "#n8n-chat", // ID del contenedor
-    });
-  }, []);
-
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+    // Esperar 5 segundos antes de ocultar el chat y mostrar los botones
+    setTimeout(() => {
+      setShowChat(false);
+    }, 5000);
+  };
 
   const handleNavigate = (path: string) => {
     setLoading(true);
@@ -49,14 +50,14 @@ export default function HeroCard() {
 
   return (
     <div
-      className="relative bg-no-repeat py-20 md:py-36 px-4"
+      className="relative h-screen overflow-hidden flex items-center justify-center px-4 bg-no-repeat"
       style={{
         backgroundImage: "url('/sirena_initial.png')",
         backgroundSize: "70%",
         backgroundPosition: "95% center",
       }}
     >
-      <div className="relative max-w-3xl mx-auto text-center">
+      <div className="relative max-w-3xl w-full mx-auto text-center flex flex-col items-center justify-center gap-6">
         <h1 className="text-3xl sm:text-4xl md:text-6xl font-semibold leading-tight text-blue-400">
           Automátiza tu día a día con <br />
           <span className="text-gray-600">MermaidAI</span>
@@ -67,26 +68,31 @@ export default function HeroCard() {
           automatizar tareas y descubrir nuevas formas de aprender. 🧜‍♀️💡
         </p>
 
-        <div
-          id="n8n-chat"
-          className="mt-16 mx-auto max-w-xl bg-white rounded-2xl shadow-lg"
-        ></div>
+        {showChat && (
+          <div className="mt-6 flex justify-center w-full">
+            <div className="w-full max-w-md">
+              <HeroChat onLoginSuccess={handleLoginSuccess} />
+            </div>
+          </div>
+        )}
 
-        <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-          <button
-            onClick={() => handleNavigate("/Home")}
-            className="bg-blue-400 hover:bg-blue-700 text-white rounded-full px-6 py-3 font-medium transition"
-          >
-            Empezamos
-          </button>
+        {!showChat && isLoggedIn && (
+          <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+            <button
+              onClick={() => handleNavigate("/Home")}
+              className="bg-blue-400 hover:bg-blue-700 text-white rounded-full px-6 py-3 font-medium transition"
+            >
+              Empezamos
+            </button>
 
-          <button
-            onClick={() => handleNavigate("#about")}
-            className="bg-blue-400 hover:bg-blue-700 text-white rounded-full px-6 py-3 font-medium transition"
-          >
-            Sobre nosotros
-          </button>
-        </div>
+            <button
+              onClick={() => handleNavigate("#about")}
+              className="bg-blue-400 hover:bg-blue-700 text-white rounded-full px-6 py-3 font-medium transition"
+            >
+              Sobre nosotros
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
