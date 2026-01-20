@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/sidebar";
 import { MainNav } from "@/components/main-nav";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
+import UserMenu from "@/components/UserMenu/UserMenu";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -55,7 +56,11 @@ export default function DashboardLayout({
             <Menu className="h-6 w-6" />
             <span className="sr-only">Abrir menú</span>
           </Button>
+          <div className="flex-1" />
           <MainNav />
+          <div className="flex items-center px-4">
+            <UserMenu />
+          </div>
         </header>
 
         {/* Título opcional, arriba a la izquierda */}
@@ -75,3 +80,4 @@ export default function DashboardLayout({
     </div>
   );
 }
+

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { BookOpen, BrainCog, FileText, GraduationCap } from 'lucide-react';
 import DashboardLayout from '../dashboard-layout';
+import AuthGuard from '@/components/AuthGuard/AuthGuard';
 
 export default function Home() {
   const [fadeIn, setFadeIn] = useState(false);
@@ -12,7 +13,8 @@ export default function Home() {
   }, []);
 
   return (
-    <DashboardLayout>
+    <AuthGuard>
+      <DashboardLayout>
       <div className={`transition-opacity duration-1000 ${fadeIn ? "opacity-100" : "opacity-0"}`}>
         <div className="max-w-4xl mx-auto p-6">
           <h1 className="text-4xl md:text-5xl font-bold text-center mb-6">
@@ -127,5 +129,6 @@ export default function Home() {
         </div>
       </div>
     </DashboardLayout>
+    </AuthGuard>
   );
 }

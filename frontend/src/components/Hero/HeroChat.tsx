@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Message {
   id: string;
@@ -29,18 +30,10 @@ interface HeroChatProps {
 }
 
 export default function HeroChat({ onLoginSuccess }: HeroChatProps) {
+  const { user, login } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [userInfo, setUserInfo] = useState<{
-    user_id: string;
-    name: string | null;
-    isLoggedIn: boolean;
-  }>({
-    user_id: "",
-    name: null,
-    isLoggedIn: false,
-  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -103,10 +96,9 @@ export default function HeroChat({ onLoginSuccess }: HeroChatProps) {
         const userId = data.user_id?.trim() || "";
         // Solo actualizar si tenemos un user_id válido (no solo "\n" o vacío)
         if (userId && userId !== "\n" && userId.length > 0) {
-          setUserInfo({
+          login({
             user_id: userId,
             name: data.name || null,
-            isLoggedIn: true,
           });
 
           // Notificar al padre que el login ha sido correcto
@@ -114,9 +106,6 @@ export default function HeroChat({ onLoginSuccess }: HeroChatProps) {
             onLoginSuccess();
           }
         }
-      } else {
-        // Si el login es false, mantener el estado actual (no resetear)
-        // Esto permite que el usuario pueda seguir intentando login/registro
       }
 
       // Crear mensaje del asistente
@@ -160,14 +149,14 @@ export default function HeroChat({ onLoginSuccess }: HeroChatProps) {
           </div>
           <div>
             <h3 className="text-white font-semibold text-sm">Mermaid AI</h3>
-            {userInfo.isLoggedIn && userInfo.name && (
+            {user.isLoggedIn && user.name && (
               <p className="text-white/80 text-xs">
-                👤 {userInfo.name}
+                👤 {user.name}
               </p>
             )}
           </div>
         </div>
-        {userInfo.isLoggedIn && (
+        {user.isLoggedIn && (
           <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
             Conectado
           </span>
@@ -217,7 +206,7 @@ export default function HeroChat({ onLoginSuccess }: HeroChatProps) {
             {message.role === "user" && (
               <div className="relative w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200 bg-blue-100">
                 <div className="w-full h-full flex items-center justify-center text-blue-500 font-semibold text-sm">
-                  {userInfo.name ? userInfo.name.charAt(0).toUpperCase() : "U"}
+                  {user.name ? user.name.charAt(0).toUpperCase() : "U"}
                 </div>
               </div>
             )}
@@ -245,7 +234,7 @@ export default function HeroChat({ onLoginSuccess }: HeroChatProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={
-              userInfo.isLoggedIn
+              user.isLoggedIn
                 ? "Escribe tu mensaje..."
                 : "Escribe para registrarte o iniciar sesión..."
             }

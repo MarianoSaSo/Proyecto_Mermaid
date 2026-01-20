@@ -2,16 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import HeroChat from "./HeroChat";
 
 export default function HeroCard() {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showChat, setShowChat] = useState(true);
   const router = useRouter();
 
   const handleLoginSuccess = () => {
-    setIsLoggedIn(true);
     // Esperar 5 segundos antes de ocultar el chat y mostrar los botones
     setTimeout(() => {
       setShowChat(false);
@@ -76,7 +76,7 @@ export default function HeroCard() {
           </div>
         )}
 
-        {!showChat && isLoggedIn && (
+        {!showChat && user.isLoggedIn && (
           <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
             <button
               onClick={() => handleNavigate("/Home")}
