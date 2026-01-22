@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.endpoints import upload
+from app.endpoints import upload, info_user
+
 
 app = FastAPI()
 
@@ -21,6 +22,7 @@ app.add_middleware(
 
 # --- Endpoints ---
 app.include_router(upload.router, prefix="/upload", tags=["Upload"])
+app.include_router(info_user.router, prefix="/users", tags=["Users"])
 
 @app.get("/")
 def root():

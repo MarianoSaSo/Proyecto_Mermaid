@@ -1,19 +1,21 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from minio import Minio
-from minio.error import S3Error
-from dotenv import load_dotenv
 import os
 import fitz  # PyMuPDF
 from io import BytesIO
 import re
 import unicodedata
 
-from langchain.schema import Document
-# from langchain.text_splitter import RecursiveCharacterTextSplitter  # Ya no hace falta aquí
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from minio import Minio
+from minio.error import S3Error
+from dotenv import load_dotenv
+
+from pinecone import Pinecone, ServerlessSpec
+
+from langchain_core.documents import Document
 from langchain_openai import OpenAIEmbeddings
-from pinecone import Pinecone
+from langchain_pinecone import PineconeVectorStore
 
 # ----- CARGA VARIABLES DE ENTORNO -----
 load_dotenv()
@@ -24,7 +26,7 @@ app = FastAPI()
 # ----------- CORS -----------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Cambia esto a ["http://localhost:3000"] si quieres restringir
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -49,15 +51,11 @@ minio_client = Minio(
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_INDEX_NAME = "asignaturas"
 
-# ----- UTILIDADES -----
+# ----- MODELOS -----
 class FileRequest(BaseModel):
     filename: str
 
-def ascii_safe_id(text):
-    text = unicodedata.normalize('NFKD', text)
-    text = text.encode('ascii', 'ignore').decode('ascii')
-    return re.sub(r'[^a-zA-Z0-9._-]', '_', text)
-
+# ----- UTILIDADES -----
 def descargar_y_guardar_archivo(bucket: str, filename: str, ruta_local: str):
     try:
         response = minio_client.get_object(bucket, filename)
@@ -70,12 +68,12 @@ def descargar_y_guardar_archivo(bucket: str, filename: str, ruta_local: str):
     except S3Error as e:
         raise HTTPException(status_code=500, detail=f"Error al descargar archivo: {e}")
 
-# ----- ENDPOINT UNIFICADO: DESCARGA + PROCESADO + PINECONE -----
+# ----- ENDPOINT -----
 @app.post("/procesar-pdf")
 def procesar_pdf_service(req: FileRequest):
     filename = req.filename
 
-    # 1. Guardar archivo en disco (para depuración)
+    # 1. Guardar archivo local
     ruta_local = os.path.join("descargas", filename)
     descargar_y_guardar_archivo(MINIO_BUCKET_NAME, filename, ruta_local)
 
@@ -86,75 +84,73 @@ def procesar_pdf_service(req: FileRequest):
         response.close()
         response.release_conn()
     except S3Error as e:
-        raise HTTPException(status_code=404, detail=f"Error al descargar desde MinIO: {e}")
+        raise HTTPException(status_code=404, detail=str(e))
 
-    # 3. Extraer texto del PDF con coordenadas por span (sin dividir más)
+    # 3. Extraer texto del PDF
     try:
         pdf = fitz.open(stream=file_bytes, filetype="pdf")
         documents = []
+
         for page_num in range(len(pdf)):
             page = pdf.load_page(page_num)
             blocks = page.get_text("dict")["blocks"]
+
             for block in blocks:
                 if "lines" in block:
                     for line in block["lines"]:
                         for span in line["spans"]:
                             text = span["text"].strip()
                             if text:
-                                documents.append(Document(
-                                    page_content=text,
-                                    metadata={
-                                        "page": page_num + 1,
-                                        "file": filename,
-                                        # bbox como lista de strings para no tener problemas en Pinecone
-                                        "bbox": [str(coord) for coord in span["bbox"]]
-                                    }
-                                ))
+                                documents.append(
+                                    Document(
+                                        page_content=text,
+                                        metadata={
+                                            "page": page_num + 1,
+                                            "file": filename,
+                                            "bbox": [str(c) for c in span["bbox"]],
+                                        },
+                                    )
+                                )
         pdf.close()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al procesar PDF: {e}")
+        raise HTTPException(status_code=500, detail=f"Error PDF: {e}")
 
-    # 4. No dividimos en chunks, usamos cada span como chunk
-    chunks = documents
+    # 4. Embeddings
+    embeddings = OpenAIEmbeddings(
+        model="text-embedding-3-small",
+        openai_api_key=os.getenv("OPENAI_API_KEY"),
+    )
 
-    # 5. Embeddings + Pinecone
+    # 5. Pinecone
     try:
-        embeddings = OpenAIEmbeddings(
-            openai_api_key=os.getenv("OPENAI_API_KEY"),
-            model="text-embedding-3-small",
-            dimensions=1536
+        pc = Pinecone(api_key=PINECONE_API_KEY)
+        
+        # Obtener lista de índices existentes
+        existing_indexes = pc.list_indexes()
+
+        # Crear si no existe
+        if PINECONE_INDEX_NAME not in existing_indexes:
+            pc.create_index(
+                name=PINECONE_INDEX_NAME,
+                dimension=1536,
+                metric="cosine",
+                spec=ServerlessSpec(cloud="aws", region="us-east-1"),
+            )
+
+        index = pc.Index(PINECONE_INDEX_NAME)
+
+        vector_store = PineconeVectorStore(
+            index=index,
+            embedding=embeddings,
         )
-        pinecone_client = Pinecone(api_key=PINECONE_API_KEY)
-        index = pinecone_client.Index(PINECONE_INDEX_NAME)
 
-        upserts = []
-        vector_ids = []
+        vector_store.add_documents(documents)
 
-        for i, chunk in enumerate(chunks):
-            vector_id = ascii_safe_id(f"{filename}_chunk_{i}")
-            vector_ids.append(vector_id)
-            embedding = embeddings.embed_query(chunk.page_content)
-
-            metadata = {
-                "text": chunk.page_content,
-                "source": filename,
-                "chunk": i,
-                **chunk.metadata,
-                # bbox sigue siendo lista de strings
-                "bbox": [str(coord) for coord in chunk.metadata.get("bbox", [])]
-            }
-
-            upserts.append((vector_id, embedding, metadata))
-
-        if upserts:
-            index.upsert(vectors=upserts)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al subir a Pinecone: {e}")
+        raise HTTPException(status_code=500, detail=f"Pinecone error: {e}")
 
     return {
         "status": "ok",
         "archivo": filename,
-        "archivo_guardado_en": ruta_local,
-        "chunks_subidos": len(upserts),
-        "vector_ids": vector_ids[:5]  # Mostramos solo los primeros 5 IDs como ejemplo
+        "chunks_subidos": len(documents),
     }
