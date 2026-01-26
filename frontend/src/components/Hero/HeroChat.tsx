@@ -78,7 +78,9 @@ export default function HeroChat({ onLoginSuccess }: HeroChatProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(input.trim()),
+        body: JSON.stringify({
+          user_message: input.trim(),
+        }),
       });
 
       if (!response.ok) {
@@ -88,7 +90,8 @@ export default function HeroChat({ onLoginSuccess }: HeroChatProps) {
       const data: AgentResponse = await response.json();
 
       // Normalizar el valor de login (puede venir como string "true"/"false")
-      const loginValue = typeof data.login === "string" ? data.login.trim() : String(data.login);
+      const loginValue =
+        typeof data.login === "string" ? data.login.trim() : String(data.login);
       const isLoggedIn = loginValue === "true";
 
       // Actualizar información del usuario si hay login exitoso
@@ -150,9 +153,7 @@ export default function HeroChat({ onLoginSuccess }: HeroChatProps) {
           <div>
             <h3 className="text-white font-semibold text-sm">Mermaid AI</h3>
             {user.isLoggedIn && user.name && (
-              <p className="text-white/80 text-xs">
-                👤 {user.name}
-              </p>
+              <p className="text-white/80 text-xs">👤 {user.name}</p>
             )}
           </div>
         </div>
@@ -167,9 +168,7 @@ export default function HeroChat({ onLoginSuccess }: HeroChatProps) {
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
         {messages.length === 0 && (
           <div className="text-center text-gray-500 py-8">
-            <p className="text-lg font-semibold mb-2">
-              ¡Hola! 👋 Soy EN 🧜‍♀️
-            </p>
+            <p className="text-lg font-semibold mb-2">¡Hola! 👋 Soy EN 🧜‍♀️</p>
             <p className="text-sm">
               Puedes registrarte o iniciar sesión para comenzar
             </p>
