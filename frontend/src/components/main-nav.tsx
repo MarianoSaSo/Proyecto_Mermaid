@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { ModeToggle } from './mode-toggle';
+import UserMenu from './UserMenu/UserMenu';
 
 export function MainNav() {
   const pathname = usePathname();
@@ -51,6 +52,7 @@ export function MainNav() {
           </div>
           <nav className="flex items-center">
             <ModeToggle />
+            <UserMenu />
           </nav>
         </div>
       </div>
