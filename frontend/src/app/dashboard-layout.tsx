@@ -58,9 +58,7 @@ export default function DashboardLayout({
           </Button>
           <div className="flex-1" />
           <MainNav />
-          <div className="flex items-center px-4">
-            <UserMenu />
-          </div>
+          
         </header>
 
         {/* Título opcional, arriba a la izquierda */}
