@@ -30,7 +30,7 @@ interface HeroChatProps {
 }
 
 export default function HeroChat({ onLoginSuccess }: HeroChatProps) {
-  const { user, login } = useAuth();
+  const { user, login, verifyAndLogin, isVerifying } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -90,8 +90,7 @@ export default function HeroChat({ onLoginSuccess }: HeroChatProps) {
       const data: AgentResponse = await response.json();
 
       // Normalizar el valor de login (puede venir como string "true"/"false")
-      const loginValue =
-        typeof data.login === "string" ? data.login.trim() : String(data.login);
+      const loginValue = typeof data.login === "string" ? data.login.trim() : String(data.login);
       const isLoggedIn = loginValue === "true";
 
       // Actualizar información del usuario si hay login exitoso
@@ -99,14 +98,32 @@ export default function HeroChat({ onLoginSuccess }: HeroChatProps) {
         const userId = data.user_id?.trim() || "";
         // Solo actualizar si tenemos un user_id válido (no solo "\n" o vacío)
         if (userId && userId !== "\n" && userId.length > 0) {
-          login({
-            user_id: userId,
-            name: data.name || null,
-          });
+          // Usar verificación segura en lugar de login directo
+          const verificationSuccess = await verifyAndLogin(userId);
 
-          // Notificar al padre que el login ha sido correcto
-          if (onLoginSuccess) {
-            onLoginSuccess();
+          if (verificationSuccess) {
+            // Notificar al padre que el login ha sido correcto
+            if (onLoginSuccess) {
+              onLoginSuccess();
+            }
+
+            // Añadir mensaje de éxito
+            const successMessage: Message = {
+              id: (Date.now() + 1).toString(),
+              role: "assistant",
+              content: "✅ **Verificación exitosa**. Has iniciado sesión de forma segura.",
+              timestamp: new Date().toISOString(),
+            };
+            setMessages((prev) => [...prev, successMessage]);
+          } else {
+            // Añadir mensaje de error de verificación
+            const errorMessage: Message = {
+              id: (Date.now() + 1).toString(),
+              role: "assistant",
+              content: "❌ **Error de verificación**. No se pudo verificar tu identidad. Por favor, inténtalo de nuevo.",
+              timestamp: new Date().toISOString(),
+            };
+            setMessages((prev) => [...prev, errorMessage]);
           }
         }
       }
@@ -153,7 +170,9 @@ export default function HeroChat({ onLoginSuccess }: HeroChatProps) {
           <div>
             <h3 className="text-white font-semibold text-sm">Mermaid AI</h3>
             {user.isLoggedIn && user.name && (
-              <p className="text-white/80 text-xs">👤 {user.name}</p>
+              <p className="text-white/80 text-xs">
+                👤 {user.name}
+              </p>
             )}
           </div>
         </div>
@@ -168,7 +187,9 @@ export default function HeroChat({ onLoginSuccess }: HeroChatProps) {
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
         {messages.length === 0 && (
           <div className="text-center text-gray-500 py-8">
-            <p className="text-lg font-semibold mb-2">¡Hola! 👋 Soy EN 🧜‍♀️</p>
+            <p className="text-lg font-semibold mb-2">
+              ¡Hola! 👋 Soy EN 🧜‍♀️
+            </p>
             <p className="text-sm">
               Puedes registrarte o iniciar sesión para comenzar
             </p>
@@ -178,9 +199,8 @@ export default function HeroChat({ onLoginSuccess }: HeroChatProps) {
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`flex items-start gap-2 ${
-              message.role === "user" ? "justify-end" : "justify-start"
-            }`}
+            className={`flex items-start gap-2 ${message.role === "user" ? "justify-end" : "justify-start"
+              }`}
           >
             {message.role === "assistant" && (
               <div className="relative w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200 bg-gradient-to-br from-blue-300 to-blue-500 flex items-center justify-center">
@@ -188,11 +208,10 @@ export default function HeroChat({ onLoginSuccess }: HeroChatProps) {
               </div>
             )}
             <div
-              className={`max-w-[75%] py-2 px-3 rounded-lg text-sm shadow-sm ${
-                message.role === "user"
+              className={`max-w-[75%] py-2 px-3 rounded-lg text-sm shadow-sm ${message.role === "user"
                   ? "bg-blue-500 text-white"
                   : "bg-white text-gray-800 border border-gray-200"
-              }`}
+                }`}
             >
               {(message.content || "").split("\n").map((line, i) => (
                 <p
@@ -212,13 +231,16 @@ export default function HeroChat({ onLoginSuccess }: HeroChatProps) {
           </div>
         ))}
 
-        {isLoading && (
+        {(isLoading || isVerifying) && (
           <div className="flex items-start gap-2">
             <div className="relative w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200 bg-gradient-to-br from-blue-300 to-blue-500 flex items-center justify-center">
               <span className="text-white text-sm">🧜‍♀️</span>
             </div>
             <div className="bg-white py-2 px-3 rounded-lg text-sm shadow-sm border border-gray-200">
               <LoadingDots />
+              {isVerifying && (
+                <p className="text-xs text-gray-500 mt-1">Verificando usuario...</p>
+              )}
             </div>
           </div>
         )}
@@ -238,12 +260,12 @@ export default function HeroChat({ onLoginSuccess }: HeroChatProps) {
                 : "Escribe para registrarte o iniciar sesión..."
             }
             className="flex-1 p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800"
-            disabled={isLoading}
+            disabled={isLoading || isVerifying}
             ref={inputRef}
           />
           <button
             type="submit"
-            disabled={isLoading || !input.trim()}
+            disabled={isLoading || isVerifying || !input.trim()}
             className="px-4 py-2 text-sm rounded-lg bg-blue-500 text-white border border-transparent hover:bg-blue-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Enviar
