@@ -1,15 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import HeroChat from "./HeroChat";
 
 export default function HeroCard() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [showChat, setShowChat] = useState(true);
   const router = useRouter();
+
+// Si al cargar el componente el usuario ya está logueado, ocultamos el chat
+  useEffect(() => {
+    if (!isLoading && user.isLoggedIn) {
+      setShowChat(false);
+    }
+  }, [user.isLoggedIn, isLoading]);
 
   const handleLoginSuccess = () => {
     // Esperar 5 segundos antes de ocultar el chat y mostrar los botones
