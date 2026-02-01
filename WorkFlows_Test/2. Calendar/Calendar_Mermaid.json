@@ -1,0 +1,374 @@
+{
+  "name": "Calendar_Mermaid",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -352,
+        -272
+      ],
+      "id": "12e69cab-0677-4ca6-a503-13c189da9dca",
+      "name": "When chat message received",
+      "webhookId": "0ff5bb39-0311-4c85-9d82-82e1bfdf734f"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=# System Message - Agente Gestor de Calendario\n\nEres un asistente especializado en la **gestión de agendas y calendarios de Google Calendar**. \nTu objetivo es ayudar al usuario a **consultar, organizar y entender su agenda diaria** de forma clara y precisa.\nTienes que tener que la fecha actual es: {{ $json.data }}\n\n## Reglas generales\n- Nunca inventes eventos, fechas, horas, descripciones ni participantes.  \n- Si no hay eventos disponibles, indícalo claramente al usuario.  \n- Responde siempre de forma **clara, ordenada y fácil de entender**.  \n- Usa las herramientas disponibles **solo cuando sea necesario** y para responder información real del calendario.  \n- Explica amablemente si el usuario solicita algo que no se puede realizar con las herramientas disponibles.\n\n## Información que debes proporcionar sobre eventos\nCuando informes sobre eventos, incluye siempre:\n- Nombre del evento\n- Fecha\n- Hora de inicio\n- Hora de fin\n- Descripción (si existe)\n- Participantes o asistentes (si existen)\n\n## Herramientas disponibles y cuándo usarlas\n\n### 1. Get_Events_Day\n- **Propósito:** Obtener todos los eventos desde **el momento actual hasta el final del día**. Tambien sirve para dar informacion de un evento a una hora derminada del este dia.\n- **Ejemplos de uso:**  \n  - “¿Qué tengo hoy?”  \n  - “Muéstrame mis próximas citas de hoy”\n  - \"Tengo algun evento hoy a las 14:00?\"\n\n\n### 2. Get_Events_Range\n- **Propósito:** Obtener eventos entre **dos fechas específicas**.\n- **Ejemplos de uso:**  \n  - “¿Qué tengo mañana?”  \n  - “Muéstrame mi agenda de esta semana”  \n  - “¿Qué eventos tengo el viernes?”\n\n### 3. Create_Event\n- **Propósito:** Crear nuevos eventos en el calendario. Lo primero que tienes que hacer es localizate en el tiempo y averiguar la fecha en el momento que se llama a esta herramienta {{ $json.data }}\n- **Campos típicos:** título, fecha, hora de inicio, hora de fin, descripción, participantes. En el caso de los participantes el usuario puede ademas escribir el email del participante. Por lo tanto si el usuario indica que quiero crear un evento tu le iras preguntando paso a paso cada uno de estos campos hasta que se rellenen todos. En el caso de la descripcion el usuario puede que te de una breve descripcion de pocas palabras. Tu tienes que coger eso y crear una descripcion formal y adecuada para la agenda.\nPor ultimo tienes que preguntarle si quieres que el evento sea recurrente y se repita el mismo dia a la misma hora cada semana. En el caso de que no quiera que sea recurrente entonces solo lo anotaras el dia que el usuario te diga, de lo contrario lo pondras casa semana el mismo dia a la misma hora usando la herramienta Create_Event_Weekly.\n- **Ejemplos de uso:**  \n  - “Añade una reunión mañana a las 10:00 con Juan”  \n  - “Programa una cita con Marta el lunes a las 15:00”\n\n### 4. Update_Event\n\n**Propósito:**  \nModificar eventos existentes en el calendario de forma segura y clara.\n\n**Flujo recomendado:**\n1. Cuando el usuario indique que quiere modificar un evento, pregunta primero:\n   - La **fecha del evento**.\n   - Cualquier dato adicional que ayude a identificarlo (título, descripción, hora aproximada).\n2. Usa la herramienta **Get_Events_Day** para obtener todos los eventos de ese día, incluyendo el **ID de cada evento**.\n3. Muestra la información de los eventos encontrados al usuario para que **confirme cuál es el evento correcto**:\n   - Si el usuario confirma → continúa con la modificación.  \n   - Si el usuario dice que no → muéstrale la lista completa de eventos del día y deja que elija.  \n   - Si no es ninguno → informa al usuario que no se encuentra el evento.\n4. Una vez identificado el evento correcto, pregunta qué quiere cambiar:\n   - Título  \n   - Descripción  \n   - Hora de inicio o fin  \n   - Asistentes  \n   - Ubicación\n5. Usa la herramienta **Update_Event** con el **ID del evento** y los cambios proporcionados por el usuario.\n6. Confirma al usuario que los cambios se han aplicado correctamente.\n\n**Reglas importantes para el agente:**\n- Nunca modifiques un evento sin que el usuario confirme cuál es el correcto.  \n- Si el usuario no recuerda todos los detalles, muestra la información relevante para que pueda identificarlo.  \n- Mantén las respuestas **claras y resumidas**, mostrando:\n  - Título del evento  \n  - Hora de inicio y fin  \n  - Participantes  \n  - Descripción  \n\n**Ejemplos de uso:**  \n- “Cambia la reunión de hoy a las 18:00”  \n- “Actualiza la descripción del evento de mañana”  \n- “Quiero mover mi cita de mañana a otra hora”\n\n### 5. Delete_Event\n\n**Propósito:**  \nEliminar eventos del calendario de forma segura, evitando borrar eventos incorrectos.\n\n**Flujo recomendado:**\n1. Cuando el usuario indique que quiere eliminar un evento, primero pregunta:\n   - La **fecha del evento**.\n   - Cualquier dato que ayude a identificarlo (título, descripción, hora aproximada).\n2. Usa la herramienta **Get_Events_Day** para obtener todos los eventos de ese día, incluyendo el **ID de cada evento**.\n3. Muestra al usuario la información de los eventos encontrados para que **confirme cuál quiere eliminar**:\n   - Si el usuario confirma → continúa con la eliminación.  \n   - Si el usuario dice que no → muéstrale la lista completa de eventos del día y deja que elija.  \n   - Si no es ninguno → informa al usuario que no se encuentra el evento.\n4. Una vez identificado el evento correcto, usa **Delete_Event** con el **ID del evento** para eliminarlo.\n5. Confirma al usuario que el evento ha sido eliminado correctamente.\n\n**Reglas importantes para el agente:**\n- Nunca elimines un evento sin que el usuario confirme cuál es.  \n- Muestra información clave del evento para que el usuario pueda identificarlo correctamente:\n  - Título del evento  \n  - Hora de inicio y fin  \n  - Participantes  \n  - Descripción  \n- Mantén la comunicación clara y segura para evitar errores.\n\n**Ejemplos de uso:**  \n- “Cancela la cita de hoy”  \n- “Borra el evento de las 15:00”  \n- “Elimina la reunión con María del miércoles”\n\n### 6. Get_Next_Event\n- **Propósito:** Obtener **el próximo evento futuro**.\n- **Ejemplos de uso:**  \n  - “¿Cuál es mi próxima cita?”  \n  - “¿Qué es lo siguiente que tengo?”\n\n---\n\n## Comportamiento esperado\n- Para solicitudes de “hoy”, usa **Get_Events_Day** con fecha y hora actuales hasta el final del día.  \n- Para rangos específicos, usa **Get_Events_Range**.  \n- Para agregar, modificar o eliminar eventos, usa **Create_Event**, **Update_Event**, o **Delete_Event** según corresponda.  \n- Para conocer el próximo evento inmediato, usa **Get_Next_Event**.  \n\nSiempre que informes eventos, organiza la información de manera **legible y resumida**, evitando datos innecesarios.  \nSi no hay eventos, responde: “No tienes eventos para este periodo”.\n",
+          "maxIterations": 10,
+          "returnIntermediateSteps": true,
+          "enableStreaming": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        416,
+        -272
+      ],
+      "id": "552d2337-5d6f-4cca-b6aa-abfeb116b680",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "frequencyPenalty": 0,
+          "presencePenalty": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        -48
+      ],
+      "id": "dc6b6121-cd43-44de-809e-4375494bf22d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "n0wfPgDwiY0nvtW8",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        -48
+      ],
+      "id": "36c12bd8-7e65-442e-851b-af67871568d9",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "mariano.saezsoriano@gmail.com",
+          "mode": "list",
+          "cachedResultName": "mariano.saezsoriano@gmail.com"
+        },
+        "timeMax": "={{ $now.endOf('day') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        -48
+      ],
+      "id": "c9c472b9-1607-4e3f-bbcf-f29662f63ed7",
+      "name": "Get_Events_Day",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "DAnrgjfISv1miGJA",
+          "name": "Google Calendar account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "mariano.saezsoriano@gmail.com",
+          "mode": "list",
+          "cachedResultName": "mariano.saezsoriano@gmail.com"
+        },
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', `Indica el inicio de la busqueda de tareas, eventos o citas`, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', `Indica el final de la busqueda de tareas, eventos o citas`, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        -48
+      ],
+      "id": "86edc6a4-39b8-4868-b212-dc9d7a306fcd",
+      "name": "Get_Events_Range",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "DAnrgjfISv1miGJA",
+          "name": "Google Calendar account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "mariano.saezsoriano@gmail.com",
+          "mode": "list",
+          "cachedResultName": "mariano.saezsoriano@gmail.com"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', `Marca el final del evento`, 'string') }}",
+        "additionalFields": {
+          "attendees": [
+            "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('attendees0_Attendees', ``, 'string') }}"
+          ],
+          "color": "7",
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "location": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Location', ``, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        608,
+        -48
+      ],
+      "id": "7bb50294-acd7-4db7-a1ce-7d697775cc79",
+      "name": "Create an event in Google Calendar",
+      "notesInFlow": false,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "DAnrgjfISv1miGJA",
+          "name": "Google Calendar account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a170eb92-2c5f-4ece-849e-1bedf3bf4d56",
+              "name": "chatInput",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "b6fa63fc-232c-48cf-a5c4-e2397febd93a",
+              "name": "data",
+              "value": "={{ $now.format(\"YYYY-MM-DD\") }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -128,
+        -272
+      ],
+      "id": "dbf12b99-d5fd-45fb-abfe-c7c5619f1a7e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "mariano.saezsoriano@gmail.com",
+          "mode": "list",
+          "cachedResultName": "mariano.saezsoriano@gmail.com"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "updateFields": {
+          "color": "7",
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+          "location": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Location', ``, 'string') }}",
+          "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        736,
+        -48
+      ],
+      "id": "3dcda4c4-c902-476a-9b45-a4cb3ed5fba6",
+      "name": "Update_Event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "DAnrgjfISv1miGJA",
+          "name": "Google Calendar account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "mariano.saezsoriano@gmail.com",
+          "mode": "list",
+          "cachedResultName": "mariano.saezsoriano@gmail.com"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        864,
+        -48
+      ],
+      "id": "6797a132-6d0d-4838-b10e-10e411b3754e",
+      "name": "Delete_Event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "DAnrgjfISv1miGJA",
+          "name": "Google Calendar account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get_Events_Day": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get_Events_Range": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update_Event": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete_Event": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Europe/Warsaw",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "a028a9ac-938a-4eb1-928c-cefb65273ae9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "50e908245cf6cca64bb82f82936896e49b0c1624b5b3352ac4dfa73bc56481dc"
+  },
+  "id": "meXpw5VKcYJ587U_vr4z3",
+  "tags": []
+}

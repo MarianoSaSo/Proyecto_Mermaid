@@ -45,3 +45,21 @@ def get_user_info(user_id: str):
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@router.post("/logout/{user_id}")
+def logout_user(user_id: str):
+    try:
+        # Actualizar el campo 'conectado' a false
+        response = supabase.table("users").update({"conectado": False}).eq("id", user_id).execute()
+        
+        # Verificar si se actualizó algún registro (opcional, pero buena práctica)
+        # Supabase suele devolver los datos actualizados en response.data
+        
+        return {"message": "Usuario desconectado correctamente"}
+    
+    except Exception as e:
+        print(f"Error al desconectar usuario {user_id}: {e}")
+        # No queremos bloquear el logout del frontend si falla la DB, 
+        # pero devolvemos 500 para informar
+        raise HTTPException(status_code=500, detail=str(e))
+    
