@@ -1,6 +1,13 @@
-"use client";//Esto solo significa:“Este código se ejecuta en el navegador”
+"use client"; //Esto solo significa:“Este código se ejecuta en el navegador”
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import { userService } from "@/lib/userService";
 /*useState
 📌 Guarda información en memoria mientras la app está abierta
 📌 Ejemplo: usuario, contador, formulario
@@ -19,7 +26,8 @@ createContext
 useContext
 📌 Abre esa caja desde cualquier componente*/
 
-interface User {// Dice las propiedades que debe de tener el usuario 
+interface User {
+  // Dice las propiedades que debe de tener el usuario
   user_id: string;
   name: string | null;
   isLoggedIn: boolean;
@@ -32,12 +40,15 @@ interface User {// Dice las propiedades que debe de tener el usuario
     >el usuario
     >una forma de entrar
     >una forma de salir
-    >un estado de carga*/
+    >un estado de carga
+    >un estado de verificación*/
 interface AuthContextType {
-  user: User;//Información del usuario
-  login: (userData: Omit<User, 'isLoggedIn'>) => void;//Función para iniciar sesión
-  logout: () => void;//Función para cerrar sesión
-  isLoading: boolean;//Indica si se está cargando
+  user: User; //Información del usuario
+  login: (userData: Omit<User, "isLoggedIn">) => void; //Función para iniciar sesión
+  logout: () => void; //Función para cerrar sesión
+  verifyAndLogin: (userId: string) => Promise<boolean>; //Función para verificar y hacer login seguro
+  isLoading: boolean; //Indica si se está cargando
+  isVerifying: boolean; //Indica si se está verificando el usuario
 }
 
 //Crear la caja (Context), del tipo que hemos definido antes
@@ -53,23 +64,24 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 👉 Todo lo que esté dentro puede acceder al usuario*/
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User>({
-    user_id: '',
+    user_id: "",
     name: null,
     isLoggedIn: false,
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [isVerifying, setIsVerifying] = useState(false);
 
   // Cargar datos del localStorage al iniciar
   useEffect(() => {
     try {
-      const storedUser = localStorage.getItem('mermaid_user');
+      const storedUser = localStorage.getItem("mermaid_user");
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
       }
     } catch (error) {
-      console.error('Error loading user from localStorage:', error);
-      localStorage.removeItem('mermaid_user');
+      console.error("Error loading user from localStorage:", error);
+      localStorage.removeItem("mermaid_user");
     } finally {
       setIsLoading(false);
     }
@@ -80,17 +92,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!isLoading) {
       try {
         if (user.isLoggedIn) {
-          localStorage.setItem('mermaid_user', JSON.stringify(user));
+          localStorage.setItem("mermaid_user", JSON.stringify(user));
         } else {
-          localStorage.removeItem('mermaid_user');
+          localStorage.removeItem("mermaid_user");
         }
       } catch (error) {
-        console.error('Error saving user to localStorage:', error);
+        console.error("Error saving user to localStorage:", error);
       }
     }
   }, [user, isLoading]);
 
-  const login = (userData: Omit<User, 'isLoggedIn'>) => {
+  // POLL DE SEGURIDAD: Verificar periódicamente que el usuario sigue conectado en BBDD
+  useEffect(() => {
+    if (!user.isLoggedIn || !user.user_id) return;
+
+    const checkUserStatus = async () => {
+      try {
+        // Obtenemos la info actual del usuario desde el backend
+        // userService.verifyUser lanza error si conectado es false
+        await userService.verifyUser(user.user_id);
+        console.log("Verificación periódica: Usuario sigue conectado ✅");
+      } catch (error) {
+        console.warn(
+          "Verificación periódica fallida: Usuario ya no está conectado ❌",
+          error,
+        );
+        // Si falla la verificación (token expirado, conectado=false, usuario borrado), cerramos sesión
+        logout();
+      }
+    };
+
+    // Comprobar cada 10 segundos
+    const intervalId = setInterval(checkUserStatus, 10000);
+
+    // Ejecutar una vez inmediatamente al montar (opcional, para validación rápida)
+    checkUserStatus();
+
+    // Limpiar intervalo al desmontar o cuando cambia el usuario
+    return () => clearInterval(intervalId);
+  }, [user.isLoggedIn, user.user_id]);
+
+  const login = (userData: Omit<User, "isLoggedIn">) => {
     setUser({
       ...userData,
       isLoggedIn: true,
@@ -98,16 +140,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
+    // Si tenemos ID de usuario, notificamos al backend que se ha desconectado
+    if (user.user_id) {
+      userService.logout(user.user_id).catch((err) => {
+        console.error("Error al notificar logout al backend", err);
+      });
+    }
+
     setUser({
-      user_id: '',
+      user_id: "",
       name: null,
       isLoggedIn: false,
     });
-    localStorage.removeItem('mermaid_user');
+    localStorage.removeItem("mermaid_user");
+  };
+
+  // Función segura para verificar y hacer login
+  const verifyAndLogin = async (userId: string): Promise<boolean> => {
+    setIsVerifying(true);
+
+    try {
+      // Verificar usuario en el backend
+      const userData = await userService.verifyUser(userId);
+
+      // Si la verificación es exitosa, hacer login
+      login({
+        user_id: userData.id,
+        name: userData.nombre,
+      });
+
+      return true;
+    } catch (error) {
+      console.error("Error en verificación de usuario:", error);
+      logout(); // Limpiar cualquier sesión existente
+      return false;
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider
+      value={{ user, login, logout, verifyAndLogin, isLoading, isVerifying }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -116,7 +191,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

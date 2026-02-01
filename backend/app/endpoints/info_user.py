@@ -46,7 +46,7 @@ def get_user_info(user_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-@router.post("/logout/{user_id}")
+@router.post("/ /{user_id}")
 def logout_user(user_id: str):
     try:
         # Actualizar el campo 'conectado' a false
