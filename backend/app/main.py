@@ -7,9 +7,10 @@ app = FastAPI()
 
 # --- Configuración CORS ---
 origins = [
-    "http://localhost:5173",  # React (puerto típico de Vite)
-    # "http://localhost:3000",  # Si usas create-react-app
-    # "https://tudominio.com",  # Puedes añadir tu dominio cuando hagas deploy
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
 app.add_middleware(
