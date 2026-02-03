@@ -22,5 +22,7 @@ async def delete_vectors(req: FileProcessRequest):
 
 @router.delete("/delete-folder-vectors", response_model=VectorDeleteResponse)
 async def delete_folder_vectors(req: FileProcessRequest):
-    """Elimina los vectores de todos los archivos dentro de una carpeta"""
-    return borrar_carpeta_vectorial_service(req.filename)
+    """Elimina los vectores de todos los archivos dentro de una carpeta enviando la lista de rutas"""
+    # Preferimos la lista de archivos si existe, si no, usamos el filename único como lista
+    lista_archivos = req.filenames if req.filenames else [req.filename]
+    return borrar_carpeta_vectorial_service(lista_archivos)

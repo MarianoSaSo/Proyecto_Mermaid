@@ -60,7 +60,10 @@ export async function POST(req: NextRequest) {
       await fetch(`${backendBaseUrl}/upload/delete-folder-vectors`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ filename: source }),
+        body: JSON.stringify({
+          filename: source,
+          filenames: objectsToMove // Enviamos la lista real de archivos que estamos moviendo
+        }),
       });
 
       // 2. Re-procesar cada archivo PDF en la nueva ruta

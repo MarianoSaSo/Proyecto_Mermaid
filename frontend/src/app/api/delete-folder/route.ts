@@ -50,9 +50,12 @@ export async function DELETE(req: NextRequest) {
       await fetch(`${backendBaseUrl}/upload/delete-folder-vectors`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ filename: prefix }), // El backend espera 'filename' como prefijo
+        body: JSON.stringify({
+          filename: prefix,
+          filenames: objectsToDelete // Enviamos la lista real de archivos a borrar
+        }),
       });
-      console.log(`Vectores de la carpeta ${prefix} eliminados.`);
+      console.log(`Vectores de los ${objectsToDelete.length} archivos eliminados.`);
     } catch (vectorError) {
       console.error("Error al borrar vectores de carpeta en backend:", vectorError);
     }

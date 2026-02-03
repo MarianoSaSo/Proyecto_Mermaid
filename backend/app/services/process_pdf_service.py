@@ -109,14 +109,21 @@ def borrar_fichero_vectorial_service(filename: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al borrar vectores: {e}")
 
-def borrar_carpeta_vectorial_service(folder_prefix: str):
-    """Elimina los vectores asociados a una carpeta (por prefijo)"""
+def borrar_carpeta_vectorial_service(filenames: list):
+    """Elimina los vectores asociados a una lista de archivos (Batch delete)"""
+    if not filenames:
+        return {"status": "ok", "message": "No hay archivos para borrar en Pinecone"}
+        
     try:
         pc = Pinecone(api_key=settings.PINECONE_API_KEY)
         index = pc.Index(settings.PINECONE_INDEX_NAME)
-        # Nota: Depende del plan de Pinecone si soporta este tipo de filtrado complejo
-        index.delete(filter={"file": {"$regex": f"^{folder_prefix}"}})
-        return {"status": "ok", "message": f"Vectores de la carpeta {folder_prefix} eliminados"}
+        
+        # Pinecone Serverless NO soporta $regex, pero sí $in
+        # Borramos todos los vectores cuyo metadato "file" esté en la lista enviada
+        index.delete(filter={"file": {"$in": filenames}})
+        
+        return {"status": "ok", "message": f"Vectores de {len(filenames)} archivos eliminados"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al borrar carpeta vectorial: {e}")
+        raise HTTPException(status_code=500, detail=f"Error al borrar vectores en bloque: {e}")
+
 
