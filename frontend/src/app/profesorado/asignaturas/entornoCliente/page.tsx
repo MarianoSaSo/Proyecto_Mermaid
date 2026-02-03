@@ -2,8 +2,8 @@ import DashboardLayout from "@/app/dashboard-layout";
 import { asignaturas } from "@/lib/constantes-sidebar";
 import FileList from "@/components/FileList/FileList";
 
-const auto_name = "Programación"
-const subject_name = "programacion" //Same name as the folder in MinIo.
+const auto_name = "EntornoCliente"
+const subject_name = "entornoCliente" //Same name as the folder in MinIo.
 
 export default function Home() {
   return (
