@@ -1,35 +1,36 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.core.config import settings
 from app.endpoints import upload, info_user
 
-
-app = FastAPI()
-
-# --- Configuración CORS ---
-origins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,       # Permite estos orígenes
-    allow_credentials=True,
-    allow_methods=["*"],         # Permite todos los métodos (GET, POST, etc.)
-    allow_headers=["*"],         # Permite todos los headers
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    version=settings.VERSION,
+    description="Backend para la gestión de documentos y usuarios de Mermaid AI"
 )
 
-# --- Endpoints ---
-app.include_router(upload.router, prefix="/upload", tags=["Upload"])
-app.include_router(info_user.router, prefix="/users", tags=["Users"])
+# --- Configuración CORS ---
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.get("/")
-def root():
-    return {"message": "Backend funcionando correctamente"}
+# --- Registro de Rutas ---
+# Podríamos añadir un prefijo global si quisiéramos: app.include_router(upload.router, prefix="/api/v1")
+app.include_router(upload.router, prefix="/upload", tags=["Gestión de Archivos"])
+app.include_router(info_user.router, prefix="/users", tags=["Gestión de Usuarios"])
 
-# Endpoint de prueba de CORS
-@app.get("/test-cors")
-def test_cors():
-    return {"message": "CORS funciona correctamente ✅"}
+@app.get("/", tags=["Sistema"])
+async def root():
+    return {
+        "message": f"Bienvenido a la API de {settings.PROJECT_NAME}",
+        "version": settings.VERSION,
+        "status": "online"
+    }
+
+@app.get("/health", tags=["Sistema"])
+async def health_check():
+    return {"status": "healthy"}
