@@ -28,6 +28,31 @@ export async function POST(req: NextRequest) {
       destination,
       `/${BUCKET_NAME}/${source}`
     );
+
+    // --- Lógica para preservar la carpeta de origen ---
+    const lastSlashIndex = source.lastIndexOf("/");
+    if (lastSlashIndex !== -1) {
+      const folderPath = source.substring(0, lastSlashIndex + 1);
+      const keepFilePath = `${folderPath}.keep`;
+
+      // Listar objetos en la carpeta de origen (no recursivo)
+      const objects: string[] = [];
+      const stream = minioClient.listObjectsV2(BUCKET_NAME, folderPath, false);
+      for await (const obj of stream) {
+        objects.push(obj.name);
+      }
+
+      // Si es el último archivo y no hay .keep, crearlo
+      const hasKeep = objects.includes(keepFilePath);
+      const otherFiles = objects.filter(name => name !== source && name !== keepFilePath);
+
+      if (!hasKeep && otherFiles.length === 0) {
+        console.log(`Preservando carpeta origen: Creando .keep en ${folderPath}`);
+        await minioClient.putObject(BUCKET_NAME, keepFilePath, Buffer.from(""), 0);
+      }
+    }
+    // --------------------------------------------------
+
     // Eliminar el archivo original
     await minioClient.removeObject(BUCKET_NAME, source);
     return NextResponse.json({ message: "Archivo movido correctamente" });

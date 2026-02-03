@@ -46,6 +46,29 @@ export async function POST(req: NextRequest) {
       );
       await minioClient.removeObject(BUCKET_NAME, objName);
     }
+
+    // --- Lógica para preservar la carpeta contenedora del origen ---
+    const lastSlashIndex = source.lastIndexOf("/");
+    if (lastSlashIndex !== -1) {
+      const parentPath = source.substring(0, lastSlashIndex + 1);
+      const keepFilePath = `${parentPath}.keep`;
+
+      // Listar objetos en el padre (no recursivo) para ver si ha quedado vacío
+      const objects: string[] = [];
+      const parentStream = minioClient.listObjectsV2(BUCKET_NAME, parentPath, false);
+      for await (const obj of parentStream) {
+        objects.push(obj.name);
+      }
+
+      // Si no quedan archivos (ni .keep), creamos el .keep
+      const hasKeep = objects.includes(keepFilePath);
+      const otherObjects = objects.filter(name => name !== keepFilePath);
+
+      if (!hasKeep && otherObjects.length === 0) {
+        console.log(`Preservando carpeta padre: Creando .keep en ${parentPath}`);
+        await minioClient.putObject(BUCKET_NAME, keepFilePath, Buffer.from(""), 0);
+      }
+    }
     return NextResponse.json({ message: "Carpeta movida correctamente" });
   } catch (error) {
     console.error("Error moviendo carpeta en MinIO:", error);
