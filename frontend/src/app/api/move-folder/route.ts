@@ -22,8 +22,13 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+    // Normalizar rutas con barras para una comparación segura
+    const sourcePath = source.endsWith("/") ? source : `${source}/`;
+    const destPathPrefix = destination.endsWith("/") ? destination : `${destination}/`;
+
     // Evitar mover una carpeta dentro de sí misma o de sus subcarpetas
-    if (destination.startsWith(source)) {
+    // Comprobamos si el destino empieza por el origen (incluyendo la barra)
+    if (destPathPrefix.startsWith(sourcePath)) {
       return NextResponse.json(
         { error: "No puedes mover una carpeta dentro de sí misma o de sus subcarpetas" },
         { status: 400 }
@@ -46,6 +51,36 @@ export async function POST(req: NextRequest) {
       );
       await minioClient.removeObject(BUCKET_NAME, objName);
     }
+
+    // --- Sincronización con Pinecone para la carpeta ---
+    try {
+      const backendBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+      // 1. Borrar vectores de la carpeta antigua
+      await fetch(`${backendBaseUrl}/upload/delete-folder-vectors`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: source }),
+      });
+
+      // 2. Re-procesar cada archivo PDF en la nueva ruta
+      for (const objName of objectsToMove) {
+        const relativePath = objName.substring(source.length);
+        const destPath = destination + relativePath;
+
+        if (destPath.toLowerCase().endsWith(".pdf")) {
+          await fetch(`${backendBaseUrl}/upload/procesar-pdf`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ filename: destPath }),
+          });
+        }
+      }
+      console.log(`Sincronización de Pinecone completada para carpeta ${source} -> ${destination}`);
+    } catch (error) {
+      console.error("Error sincronizando Pinecone al mover carpeta:", error);
+    }
+    // ----------------------------------------------------
 
     // --- Lógica para preservar la carpeta contenedora del origen ---
     const lastSlashIndex = source.lastIndexOf("/");
@@ -78,3 +113,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

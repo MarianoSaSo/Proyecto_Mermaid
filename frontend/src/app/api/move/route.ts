@@ -55,6 +55,32 @@ export async function POST(req: NextRequest) {
 
     // Eliminar el archivo original
     await minioClient.removeObject(BUCKET_NAME, source);
+
+    // --- Sincronización con Pinecone ---
+    try {
+      const backendBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+      // 1. Borrar vectores de la ruta antigua
+      await fetch(`${backendBaseUrl}/upload/delete-vectors`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: source }),
+      });
+
+      // 2. Re-procesar en la ruta nueva (solo si es un PDF)
+      if (destination.toLowerCase().endsWith(".pdf")) {
+        await fetch(`${backendBaseUrl}/upload/procesar-pdf`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ filename: destination }),
+        });
+      }
+      console.log(`Sincronización de Pinecone completada para mover ${source} -> ${destination}`);
+    } catch (error) {
+      console.error("Error sincronizando Pinecone al mover:", error);
+    }
+    // ------------------------------------
+
     return NextResponse.json({ message: "Archivo movido correctamente" });
   } catch (error) {
     console.error("Error moviendo archivo en MinIO:", error);

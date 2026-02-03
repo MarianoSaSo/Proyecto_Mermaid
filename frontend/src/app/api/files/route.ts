@@ -29,7 +29,7 @@ export async function DELETE(req: NextRequest) {
       // 2. Comprobar si es el último archivo de la carpeta
       const objects: string[] = [];
       const stream = minioClient.listObjectsV2(BUCKET_NAME, folderPath, false); // No recursivo para ver solo este nivel
-      
+
       for await (const obj of stream) {
         objects.push(obj.name);
       }
@@ -44,8 +44,22 @@ export async function DELETE(req: NextRequest) {
       }
     }
 
-    // 4. Proceder a borrar el archivo
+    // 4. Proceder a borrar el archivo en MinIO
     await minioClient.removeObject(BUCKET_NAME, fileName);
+
+    // 5. Borrar vectores en Pinecone (Llamada al backend)
+    try {
+      const backendBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      await fetch(`${backendBaseUrl}/upload/delete-vectors`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: fileName }),
+      });
+      console.log(`Vectores de ${fileName} eliminados del backend.`);
+    } catch (vectorError) {
+      console.error("Error al notificar al backend para borrar vectores:", vectorError);
+      // No bloqueamos el éxito del borrado de MinIO por un fallo en vectores
+    }
 
     return NextResponse.json({
       message: "File deleted successfully",

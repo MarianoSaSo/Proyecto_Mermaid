@@ -41,8 +41,21 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    // Borrar todos los objetos
+    // Borrar todos los objetos en MinIO
     await minioClient.removeObjects(BUCKET_NAME, objectsToDelete);
+
+    // Borrar vectores de la carpeta en Pinecone (Backend)
+    try {
+      const backendBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      await fetch(`${backendBaseUrl}/upload/delete-folder-vectors`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: prefix }), // El backend espera 'filename' como prefijo
+      });
+      console.log(`Vectores de la carpeta ${prefix} eliminados.`);
+    } catch (vectorError) {
+      console.error("Error al borrar vectores de carpeta en backend:", vectorError);
+    }
 
     return NextResponse.json(
       { message: `Folder and all contents deleted (${objectsToDelete.length} items)` },
@@ -56,3 +69,4 @@ export async function DELETE(req: NextRequest) {
     );
   }
 }
+
