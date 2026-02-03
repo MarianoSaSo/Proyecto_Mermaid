@@ -1,94 +1,42 @@
 import os
 import fitz  # PyMuPDF
-from io import BytesIO
-import re
-import unicodedata
-
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 from minio import Minio
 from minio.error import S3Error
-from dotenv import load_dotenv
-
 from pinecone import Pinecone, ServerlessSpec
-
 from langchain_core.documents import Document
 from langchain_openai import OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
+from fastapi import HTTPException
 
-# ----- CARGA VARIABLES DE ENTORNO -----
-load_dotenv()
+from app.core.config import settings
 
-# ----- INICIAR FASTAPI -----
-app = FastAPI()
-
-# ----------- CORS -----------
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# --- Configuración MinIO ---
-MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", "localhost")
-MINIO_PORT = os.getenv("MINIO_PORT", "9000")
-MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY", "mermaidAI")
-MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY", "mermaidAI123")
-MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME", "mermaid")
-MINIO_FULL_ENDPOINT = f"{MINIO_ENDPOINT}:{MINIO_PORT}"
-
+# --- Clientes ---
 minio_client = Minio(
-    MINIO_FULL_ENDPOINT,
-    access_key=MINIO_ACCESS_KEY,
-    secret_key=MINIO_SECRET_KEY,
+    settings.MINIO_FULL_ENDPOINT,
+    access_key=settings.MINIO_ACCESS_KEY,
+    secret_key=settings.MINIO_SECRET_KEY,
     secure=False,
 )
 
-# --- Configuración Pinecone ---
-PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
-PINECONE_INDEX_NAME = "asignaturas"
-
-# ----- MODELOS -----
-class FileRequest(BaseModel):
-    filename: str
-
-# ----- UTILIDADES -----
-def descargar_y_guardar_archivo(bucket: str, filename: str, ruta_local: str):
-    try:
-        response = minio_client.get_object(bucket, filename)
-        os.makedirs(os.path.dirname(ruta_local), exist_ok=True)
-        with open(ruta_local, "wb") as f:
-            for chunk in response.stream(32 * 1024):
-                f.write(chunk)
-        response.close()
-        response.release_conn()
-    except S3Error as e:
-        raise HTTPException(status_code=500, detail=f"Error al descargar archivo: {e}")
-
-# ----- ENDPOINT -----
-@app.post("/procesar-pdf")
-def procesar_pdf_service(req: FileRequest):
-    filename = req.filename
-
-    # 1. Guardar archivo local
+def descargar_archivo_local(filename: str) -> str:
+    """Descarga un archivo de MinIO a una carpeta temporal local"""
     ruta_local = os.path.join("descargas", filename)
-    descargar_y_guardar_archivo(MINIO_BUCKET_NAME, filename, ruta_local)
-
-    # 2. Descargar archivo en memoria
     try:
-        response = minio_client.get_object(MINIO_BUCKET_NAME, filename)
-        file_bytes = BytesIO(response.read())
-        response.close()
-        response.release_conn()
+        os.makedirs(os.path.dirname(ruta_local), exist_ok=True)
+        minio_client.fget_object(settings.MINIO_BUCKET_NAME, filename, ruta_local)
+        return ruta_local
     except S3Error as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Error al descargar de MinIO: {e}")
 
-    # 3. Extraer texto del PDF
+def procesar_pdf_service(filename: str):
+    """Extrae texto de un PDF y lo sube a Pinecone"""
+    
+    # 1. Obtener el archivo
+    ruta_local = descargar_archivo_local(filename)
+
+    # 2. Extraer texto
     try:
-        pdf = fitz.open(stream=file_bytes, filetype="pdf")
+        pdf = fitz.open(ruta_local)
         documents = []
 
         for page_num in range(len(pdf)):
@@ -113,44 +61,62 @@ def procesar_pdf_service(req: FileRequest):
                                 )
         pdf.close()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error PDF: {e}")
+        raise HTTPException(status_code=500, detail=f"Error al procesar el PDF: {e}")
 
-    # 4. Embeddings
-    embeddings = OpenAIEmbeddings(
-        model="text-embedding-3-small",
-        openai_api_key=os.getenv("OPENAI_API_KEY"),
-    )
-
-    # 5. Pinecone
+    # 3. Guardar en Pinecone
     try:
-        pc = Pinecone(api_key=PINECONE_API_KEY)
-        
-        # Obtener lista de índices existentes
-        existing_indexes = pc.list_indexes()
+        embeddings = OpenAIEmbeddings(
+            model="text-embedding-3-small",
+            api_key=settings.OPENAI_API_KEY,
+        )
 
-        # Crear si no existe
-        if PINECONE_INDEX_NAME not in existing_indexes:
+        pc = Pinecone(api_key=settings.PINECONE_API_KEY)
+        
+        # Asegurar que el índice existe
+        index_names = [idx.name for idx in pc.list_indexes()]
+        if settings.PINECONE_INDEX_NAME not in index_names:
             pc.create_index(
-                name=PINECONE_INDEX_NAME,
+                name=settings.PINECONE_INDEX_NAME,
                 dimension=1536,
                 metric="cosine",
                 spec=ServerlessSpec(cloud="aws", region="us-east-1"),
             )
 
-        index = pc.Index(PINECONE_INDEX_NAME)
-
         vector_store = PineconeVectorStore(
-            index=index,
+            index_name=settings.PINECONE_INDEX_NAME,
             embedding=embeddings,
+            pinecone_api_key=settings.PINECONE_API_KEY
         )
-
+        
         vector_store.add_documents(documents)
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Pinecone error: {e}")
+        raise HTTPException(status_code=500, detail=f"Error en base de datos vectorial: {e}")
 
     return {
         "status": "ok",
         "archivo": filename,
         "chunks_subidos": len(documents),
     }
+
+def borrar_fichero_vectorial_service(filename: str):
+    """Elimina los vectores asociados a un archivo"""
+    try:
+        pc = Pinecone(api_key=settings.PINECONE_API_KEY)
+        index = pc.Index(settings.PINECONE_INDEX_NAME)
+        index.delete(filter={"file": {"$eq": filename}})
+        return {"status": "ok", "message": f"Vectores de {filename} eliminados"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al borrar vectores: {e}")
+
+def borrar_carpeta_vectorial_service(folder_prefix: str):
+    """Elimina los vectores asociados a una carpeta (por prefijo)"""
+    try:
+        pc = Pinecone(api_key=settings.PINECONE_API_KEY)
+        index = pc.Index(settings.PINECONE_INDEX_NAME)
+        # Nota: Depende del plan de Pinecone si soporta este tipo de filtrado complejo
+        index.delete(filter={"file": {"$regex": f"^{folder_prefix}"}})
+        return {"status": "ok", "message": f"Vectores de la carpeta {folder_prefix} eliminados"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al borrar carpeta vectorial: {e}")
+
