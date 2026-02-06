@@ -1,0 +1,22 @@
+from pinecone import Pinecone
+import os
+
+# Configuración manual para la limpieza puntual
+api_key = "pcsk_694STn_6h55CDpnE7bfoi7LAnKTLg98iyqDAyK32nSkqGE5njs9SFjsiKL9KcW6RChgpNS"
+index_name = "asignaturas"
+
+def limpiar_index():
+    print(f"Iniciando limpieza del índice: {index_name}...")
+    try:
+        pc = Pinecone(api_key=api_key)
+        index = pc.Index(index_name)
+        
+        # Eliminar todos los vectores
+        index.delete(delete_all=True)
+        
+        print(f"¡Éxito! Todos los vectores del índice '{index_name}' han sido eliminados.")
+    except Exception as e:
+        print(f"Error durante la limpieza: {e}")
+
+if __name__ == "__main__":
+    limpiar_index()

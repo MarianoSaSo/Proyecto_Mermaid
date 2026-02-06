@@ -42,6 +42,10 @@ def procesar_pdf_service(filename: str):
         for page_num in range(len(pdf)):
             page = pdf.load_page(page_num)
             blocks = page.get_text("dict")["blocks"]
+            
+            # Extraer la asignatura de la ruta (asumiendo formato subjects/nombre_asignatura/...)
+            partes_ruta = filename.split('/')
+            asignatura_meta = partes_ruta[1] if len(partes_ruta) > 1 else "General"
 
             for block in blocks:
                 if "lines" in block:
@@ -54,7 +58,8 @@ def procesar_pdf_service(filename: str):
                                         page_content=text,
                                         metadata={
                                             "page": page_num + 1,
-                                            "file": filename,
+                                            "Nombre del documento": filename, # Coincide con n8n
+                                            "Asignatura": asignatura_meta,     # Coincide con n8n
                                             "bbox": [str(c) for c in span["bbox"]],
                                         },
                                     )
@@ -104,7 +109,7 @@ def borrar_fichero_vectorial_service(filename: str):
     try:
         pc = Pinecone(api_key=settings.PINECONE_API_KEY)
         index = pc.Index(settings.PINECONE_INDEX_NAME)
-        index.delete(filter={"file": {"$eq": filename}})
+        index.delete(filter={"Nombre del documento": {"$eq": filename}})
         return {"status": "ok", "message": f"Vectores de {filename} eliminados"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al borrar vectores: {e}")
@@ -119,11 +124,13 @@ def borrar_carpeta_vectorial_service(filenames: list):
         index = pc.Index(settings.PINECONE_INDEX_NAME)
         
         # Pinecone Serverless NO soporta $regex, pero sí $in
-        # Borramos todos los vectores cuyo metadato "file" esté en la lista enviada
-        index.delete(filter={"file": {"$in": filenames}})
+        # Borramos todos los vectores cuyo metadato "Nombre del documento" esté en la lista enviada
+        index.delete(filter={"Nombre del documento": {"$in": filenames}})
         
         return {"status": "ok", "message": f"Vectores de {len(filenames)} archivos eliminados"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al borrar vectores en bloque: {e}")
+
+
 
 

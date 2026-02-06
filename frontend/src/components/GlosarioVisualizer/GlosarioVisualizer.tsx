@@ -173,7 +173,7 @@ export default function GlosarioVisualizer({ file, asignatura, onClose }: { file
 
             {/* Visor de Texto (.txt) del glosario */}
             <div className={`transition-all duration-300 ${pdfVisible ? "w-1/3" : "w-full"} bg-white shadow-lg p-4 rounded-lg border`}>
-              <ChatInterface asignatura={asignatura} nombreDoc={file.name} />
+              <ChatInterface asignatura={asignatura} nombreDoc={file.filepath} />
             </div>
           </>
         ) : fileExtension === "txt" ? (
@@ -187,7 +187,7 @@ export default function GlosarioVisualizer({ file, asignatura, onClose }: { file
               />
             </div>
             <div className={`transition-all duration-300 ${pdfVisible ? "w-1/3" : "w-full"} bg-white shadow-lg p-4 rounded-lg border`}>
-              <ChatInterface asignatura={asignatura} nombreDoc={file.name} />
+              <ChatInterface asignatura={asignatura} nombreDoc={file.filepath} />
             </div>
           </div>
         ) : fileExtension === "docx" ? (
@@ -195,18 +195,18 @@ export default function GlosarioVisualizer({ file, asignatura, onClose }: { file
             <h2 className="text-lg font-normal mb-4 text-gray-800">Vista previa del archivo DOCX</h2>
             {fileUrl ? (
               <div className="flex gap-5">
-              <iframe
-                src={fileUrl}
-                title="Vista previa DOCX"
-                width="100%"
-                height="700px"
-                style={{ border: '1px solid #ccc', background: 'white' }}
+                <iframe
+                  src={fileUrl}
+                  title="Vista previa DOCX"
+                  width="100%"
+                  height="700px"
+                  style={{ border: '1px solid #ccc', background: 'white' }}
                 />
                 <div className={`transition-all duration-300 ${pdfVisible ? "w-1/3" : "w-full"} bg-white shadow-lg p-4 rounded-lg border`}>
-              <ChatInterface asignatura={asignatura} nombreDoc={file.name} />
-            </div>
+                  <ChatInterface asignatura={asignatura} nombreDoc={file.filepath} />
                 </div>
-              
+              </div>
+
             ) : (
               <p>Cargando documento...</p>
             )}

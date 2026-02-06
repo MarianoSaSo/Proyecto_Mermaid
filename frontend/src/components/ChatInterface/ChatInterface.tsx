@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Message, Conversation, ChatState } from './chat';
 import { PlusIcon, XMarkIcon, TrashIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
+import { useAuth } from '@/contexts/AuthContext';
 
 const LoadingDots = () => (
   <div className="flex space-x-1.5 items-center">
@@ -19,6 +20,7 @@ interface ChatInterfaceProps {
 }
 
 export default function ChatInterface({ asignatura, nombreDoc }: ChatInterfaceProps) {
+  const { user } = useAuth();
   const [chatState, setChatState] = useState<ChatState>({
     conversations: [],
     activeConversationId: null
@@ -196,6 +198,8 @@ export default function ChatInterface({ asignatura, nombreDoc }: ChatInterfacePr
         },
         body: JSON.stringify({
           message: input.trim(),
+          user_id: user?.user_id || "",
+          user_name: user?.name || "Usuario",
           asignatura: asignatura || "",
           nombreDoc: nombreDoc || ""
         }),
@@ -373,8 +377,8 @@ export default function ChatInterface({ asignatura, nombreDoc }: ChatInterfacePr
                       setChatState((prev) => ({ ...prev, activeConversationId: conv.id }))
                     }
                     className={`group relative flex items-center px-4 py-2 rounded-t-lg min-w-[120px] transition-all duration-200 ${chatState.activeConversationId === conv.id
-                        ? 'bg-white text-gray-800 border-t-2 border-blue-500 border-x border-b-white z-10'
-                        : 'text-gray-600 hover:bg-gray-100'
+                      ? 'bg-white text-gray-800 border-t-2 border-blue-500 border-x border-b-white z-10'
+                      : 'text-gray-600 hover:bg-gray-100'
                       }`}
                   >
                     <span className="truncate">{conv.name}</span>
@@ -435,7 +439,7 @@ export default function ChatInterface({ asignatura, nombreDoc }: ChatInterfacePr
           )}
         </div>
 
-       {/* Mensajes */}
+        {/* Mensajes */}
         <div className="flex-1 overflow-y-auto min-h-[600px] max-h-[calc(100vh-200px)] space-y-2 pr-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
           <div className="space-y-2 p-4">
             {(!activeConversation || activeConversation.messages.length === 0) && (
@@ -501,8 +505,8 @@ export default function ChatInterface({ asignatura, nombreDoc }: ChatInterfacePr
                 )}
                 <div
                   className={`max-w-[75%] py-2 px-3 rounded-lg text-sm shadow-sm ${message.role === 'user'
-                      ? 'bg-black text-white'
-                      : 'bg-white text-gray-800'
+                    ? 'bg-black text-white'
+                    : 'bg-white text-gray-800'
                     }`}
                 >
                   {(message.content || '').split('\n').map((line, i) => (
@@ -579,3 +583,4 @@ export default function ChatInterface({ asignatura, nombreDoc }: ChatInterfacePr
     </>
   );
 }
+
