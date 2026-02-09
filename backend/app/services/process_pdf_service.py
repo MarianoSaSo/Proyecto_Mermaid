@@ -1,3 +1,4 @@
+
 import os
 import fitz  # PyMuPDF
 from minio import Minio
@@ -36,35 +37,43 @@ def procesar_pdf_service(filename: str):
 
     # 2. Extraer texto
     try:
+        from langchain_text_splitters import RecursiveCharacterTextSplitter
+        
         pdf = fitz.open(ruta_local)
-        documents = []
-
+        
+        # 1. Extraer texto por páginas de forma más robusta
+        temp_docs = []
         for page_num in range(len(pdf)):
             page = pdf.load_page(page_num)
-            blocks = page.get_text("dict")["blocks"]
-            
-            # Extraer la asignatura de la ruta (asumiendo formato subjects/nombre_asignatura/...)
-            partes_ruta = filename.split('/')
-            asignatura_meta = partes_ruta[1] if len(partes_ruta) > 1 else "General"
-
-            for block in blocks:
-                if "lines" in block:
-                    for line in block["lines"]:
-                        for span in line["spans"]:
-                            text = span["text"].strip()
-                            if text:
-                                documents.append(
-                                    Document(
-                                        page_content=text,
-                                        metadata={
-                                            "page": page_num + 1,
-                                            "Nombre del documento": filename, # Coincide con n8n
-                                            "Asignatura": asignatura_meta,     # Coincide con n8n
-                                            "bbox": [str(c) for c in span["bbox"]],
-                                        },
-                                    )
-                                )
+            text = page.get_text("text")# Extraemos todo el texto de la página
+            if text.strip():
+                # Extraer la asignatura de la ruta
+                partes_ruta = filename.split('/')
+                asignatura_meta = partes_ruta[1] if len(partes_ruta) > 1 else "General"
+                
+                temp_docs.append(
+                    Document(
+                        page_content=text,
+                        metadata={
+                            "page": page_num + 1,
+                            "Nombre del documento": filename,
+                            "Asignatura": asignatura_meta,
+                        }
+                    )
+                )
         pdf.close()
+
+        # 2. Fragmentación profesional (Chunking)
+        # Creamos trozos de 1000 caracteres con un solape de 200 para no perder contexto
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000,
+            chunk_overlap=200,
+            separators=["\n\n", "\n", ".", " ", ""]
+        )
+        
+        # Dividimos los documentos de las páginas en chunks más manejables pero con contexto
+        documents = text_splitter.split_documents(temp_docs)
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al procesar el PDF: {e}")
 
@@ -130,7 +139,6 @@ def borrar_carpeta_vectorial_service(filenames: list):
         return {"status": "ok", "message": f"Vectores de {len(filenames)} archivos eliminados"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al borrar vectores en bloque: {e}")
-
 
 
 
