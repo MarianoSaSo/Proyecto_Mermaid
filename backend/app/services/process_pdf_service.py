@@ -1,4 +1,3 @@
-
 import os
 import fitz  # PyMuPDF
 from minio import Minio
@@ -37,9 +36,8 @@ def procesar_pdf_service(filename: str):
 
     # 2. Extraer texto
     try:
-        from langchain_text_splitters import RecursiveCharacterTextSplitter
-        
         pdf = fitz.open(ruta_local)
+        from langchain_text_splitters import RecursiveCharacterTextSplitter
         
         # 1. Extraer texto por páginas de forma más robusta
         temp_docs = []
@@ -139,6 +137,4 @@ def borrar_carpeta_vectorial_service(filenames: list):
         return {"status": "ok", "message": f"Vectores de {len(filenames)} archivos eliminados"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al borrar vectores en bloque: {e}")
-
-
 

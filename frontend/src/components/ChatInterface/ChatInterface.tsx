@@ -134,12 +134,33 @@ export default function ChatInterface({ asignatura, nombreDoc }: ChatInterfacePr
   };
 
   const resetAllChats = () => {
-    setChatState({
-      conversations: [],
-      activeConversationId: null
-    });
-    setShowTabs(false);
-    localStorage.removeItem('chatState');
+    if (window.confirm('¿Estás seguro de que quieres borrar todos los chats?')) {
+      setChatState({
+        conversations: [],
+        activeConversationId: null
+      });
+      setShowTabs(false);
+      localStorage.removeItem('chatState');
+    }
+  };
+
+  const clearCurrentChat = () => {
+    if (!chatState.activeConversationId) return;
+
+    if (window.confirm('¿Estás seguro de que quieres limpiar los mensajes de este chat?')) {
+      setChatState(prev => ({
+        ...prev,
+        conversations: prev.conversations.map(conv => {
+          if (conv.id === prev.activeConversationId) {
+            return {
+              ...conv,
+              messages: []
+            };
+          }
+          return conv;
+        })
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -397,11 +418,18 @@ export default function ChatInterface({ asignatura, nombreDoc }: ChatInterfacePr
               </div>
               <div className="flex items-center gap-1">
                 <button
-                  onClick={resetAllChats}
+                  onClick={clearCurrentChat}
                   className="p-2 rounded-md hover:bg-gray-200 text-gray-600 flex-shrink-0 transition-colors"
-                  title="Borrar todo el historial"
+                  title="Limpiar chat actual"
                 >
                   <TrashIcon className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={resetAllChats}
+                  className="p-2 rounded-md hover:bg-gray-200 text-red-500 flex-shrink-0 transition-colors border border-transparent hover:border-red-200"
+                  title="Borrar todo el historial"
+                >
+                  <XMarkIcon className="w-5 h-5" />
                 </button>
                 <button
                   onClick={createNewConversation}
@@ -419,11 +447,18 @@ export default function ChatInterface({ asignatura, nombreDoc }: ChatInterfacePr
                 {chatState.conversations.length > 0 && (
                   <>
                     <button
-                      onClick={resetAllChats}
+                      onClick={clearCurrentChat}
                       className="p-2 rounded-md hover:bg-gray-200 text-gray-600 transition-colors"
-                      title="Borrar todo el historial"
+                      title="Limpiar chat actual"
                     >
                       <TrashIcon className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={resetAllChats}
+                      className="p-2 rounded-md hover:bg-gray-200 text-red-500 transition-colors border border-transparent hover:border-red-200"
+                      title="Borrar todo el historial"
+                    >
+                      <XMarkIcon className="w-5 h-5" />
                     </button>
                     <button
                       onClick={createNewConversation}
@@ -566,10 +601,11 @@ export default function ChatInterface({ asignatura, nombreDoc }: ChatInterfacePr
                 autoFocus={false}
                 ref={inputRef}
               />
+
               <button
                 onClick={handleSubmit}
                 disabled={isLoading}
-                className="px-4 py-2 text-sm rounded-md bg-black text-white border border-transparent hover:bg-white hover:text-black hover:border-black transition-all duration-200 disabled:opacity-50 w-full md:w-auto"
+                className="px-3 py-1.5 text-xs rounded-md bg-black text-white border border-transparent hover:bg-white hover:text-black hover:border-black transition-all duration-200 disabled:opacity-50 w-full md:w-auto whitespace-nowrap"
               >
                 Enviar
               </button>
@@ -583,4 +619,3 @@ export default function ChatInterface({ asignatura, nombreDoc }: ChatInterfacePr
     </>
   );
 }
-
