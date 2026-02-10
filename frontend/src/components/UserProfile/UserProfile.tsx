@@ -115,7 +115,7 @@ export default function UserProfile({ userId }: UserProfileProps) {
                             </div>
                         </div>
                     </div>
-                    <div className="mb-4">
+                    <div className="mb-6">
                         <h1 className="text-3xl font-extrabold text-gray-900 flex items-center gap-3">
                             {userInfo.nombre} {userInfo.apellidos}
                             {userInfo.conectado && (
@@ -125,7 +125,7 @@ export default function UserProfile({ userId }: UserProfileProps) {
                                 </span>
                             )}
                         </h1>
-                        <p className="text-gray-500 font-medium">ID: {userInfo.id}</p>
+                        <p className="text-gray-700 font-medium">ID: {userInfo.id}</p>
                     </div>
                 </div>
             </div>
