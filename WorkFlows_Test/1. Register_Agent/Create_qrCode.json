@@ -1,0 +1,212 @@
+{
+  "name": "Create_qrCode",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -128,
+        176
+      ],
+      "id": "d9f7c86c-ef98-4e32-841b-34db75e6d96f",
+      "name": "OpenAI Chat Model5",
+      "credentials": {
+        "openAiApi": {
+          "id": "n0wfPgDwiY0nvtW8",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $workflow.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        48,
+        192
+      ],
+      "id": "7c931f07-00e0-4449-8c00-66269bf920ff",
+      "name": "Simple Memory5"
+    },
+    {
+      "parameters": {
+        "description": "Herramienta capaz de crear un codigo qr",
+        "jsCode": "const QRCode = require('qrcode');\n\n// Entrada del subagente\nconst userId = $json.id;\n\n// IP local de tu servidor\nconst baseUrl = \"http://192.168.0.91:3000\";\n\n// Construir URL de perfil\nconst profileUrl = `${baseUrl}/profile/${userId}`;\n\n// Generar QR en base64\nconst qrBase64 = await QRCode.toDataURL(profileUrl);\nconst base64Data = qrBase64.replace(/^data:image\\/png;base64,/, \"\");\nconst buffer = Buffer.from(base64Data, 'base64');\n\nreturn [{\n  json: {\n    id: userId,\n    profile_url: profileUrl\n  },\n  binary: {\n    qr: {\n      data: buffer,\n      mimeType: 'image/png',\n      fileName: `${userId}.png`\n    }\n  }\n}];"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        208
+      ],
+      "id": "a6e8e3cb-0982-457f-b1df-6c9c1b5b0145",
+      "name": "Code Tool1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Tomamos el string que devuelve el subagente\nconst qrString = $json[\"output\"];\n\n// Convertimos a objeto JSON\nconst qrData = JSON.parse(qrString);\n\nreturn [{\n  json: qrData\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        -64
+      ],
+      "id": "3d668ba0-aff6-4162-8c98-b16d7a0aeb7d",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.id }}",
+        "options": {
+          "systemMessage": "Eres un subagente encargado de crear un código QR para un usuario.\n\nTu tarea:\n\n1. Recibirás únicamente el campo `id` del usuario.\n2. Con ese `id`, generarás la URL de su perfil en la forma:\n   http://192.168.0.91:3000/profile/{id}\n3. Generarás un QR que apunte a esa URL.\n4. Devuelve siempre un objeto JSON **real**, no como texto, usando las propiedades:\n\n- id → id del usuario\n- profile_url → URL de su perfil\n- qr_base64 → QR en base64\n\n⚠️ No escribas el JSON como texto ni entre comillas.  \n⚠️ No realices ninguna otra acción ni interacción con el usuario.  \n⚠️ No inventes datos. Solo genera el QR y devuelve la información.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        16,
+        -64
+      ],
+      "id": "64815069-5b30-486d-b4d9-5dca7ba4f297",
+      "name": "Create_qrCode"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -512,
+        -64
+      ],
+      "id": "93771124-5885-4784-957a-d55f2b979672",
+      "name": "Workflow Input Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0a3f791d-143f-41c6-9e93-89e46428baf9",
+              "name": "id",
+              "value": "={{ $json.query }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -224,
+        -64
+      ],
+      "id": "67d5cacf-2129-4082-83bc-561ffefbcdfe",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {
+    "Workflow Input Trigger": [
+      {
+        "json": {
+          "query": "123456789"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "OpenAI Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Create_qrCode",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory5": {
+      "ai_memory": [
+        [
+          {
+            "node": "Create_qrCode",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code Tool1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Create_qrCode",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create_qrCode": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow Input Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Create_qrCode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "4387a724-560c-4fb3-b6a9-9a1797e13ba9",
+  "meta": {
+    "instanceId": "50e908245cf6cca64bb82f82936896e49b0c1624b5b3352ac4dfa73bc56481dc"
+  },
+  "id": "QAPan_CQAMuaKGsNp2-mU",
+  "tags": []
+}
