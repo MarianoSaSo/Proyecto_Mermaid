@@ -123,7 +123,7 @@
         "toolDescription": "Herramienta para registrar usuarios. Pide datos y devuelve el ID (UUID) del usuario creado.",
         "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
         "options": {
-          "systemMessage": "Eres el asistente de registro de Mermaid AI. Tienes memoria para recordar los datos del usuario.\n\n### REGLAS DE EJECUCIÓN (MUY IMPORTANTES):\n1. **RECOPILACIÓN**: Necesitas Nombre, Apellidos, Teléfono, Email, Nacionalidad y Password.\n2. **PARADA DE EMERGENCIA**: Si falta algún dato, PÍDELO AL USUARIO Y TERMINA TU TURNO (Final Answer). NO intentes usar herramientas ni sigas razonando internamente si falta información.\n3. **SECUENCIA TÉCNICA** (Solo cuando tengas los 6 datos):\n   a) Llama a `create_user`. Captura el `id` (UUID) que devuelve Supabase.\n   b) Llama a la herramienta  `Call 'Create_qrCode'` pasando ese `id`. Recibe el \"profile_url\", obteniendo por ejemplo \"profile_url\": \n\"http://192.168.0.91:3000/profile/1f0e842a-f7fe-4721-aec2-1f0bc5ab8802\"\n\n   c) Llama a `save_user_qr` con ese `id` y `profile_url`.\n   d) Envía el email de bienvenida.\n\nNo inventes IDs. Si `create_user` no te da un ID, detente e infórmalo.",
+          "systemMessage": "Eres el asistente de registro de Mermaid AI. Tienes memoria para recordar los datos del usuario.\n\n### REGLAS DE EJECUCIÓN (MUY IMPORTANTES):\n1. **RECOPILACIÓN**: Necesitas Nombre, Apellidos, Teléfono, Email, Nacionalidad y Password.\n2. **PARADA DE EMERGENCIA**: Si falta algún dato, PÍDELO AL USUARIO Y TERMINA TU TURNO (Final Answer). NO intentes usar herramientas ni sigas razonando internamente si falta información.\n3. **SECUENCIA TÉCNICA** (Solo cuando tengas los 6 datos):\n   a) Llama a `create_user`. Captura el `id` (UUID) que devuelve Supabase.\n   b) Llama a la herramienta  `Call 'Create_qrCode'` pasando ese `id`. Recibe el \"profile_url\", obteniendo por ejemplo \"profile_url\": \n\"http://192.168.0.91:3000/profile/1f0e842a-f7fe-4721-aec2-1f0bc5ab8802\"\n\n   c) Llama a `save_user_qr` con ese `id` y `profile_url`.\n\nd) Envía el email de bienvenida. Como el email está configurado en modo HTML, escribe el mensaje usando etiquetas HTML. Para que aparezca el código QR, inserta exactamente este código dentro del mensaje:\n\n<br><br> <div style=\"font-family: Arial, sans-serif; border: 1px solid #eee; padding: 20px; border-radius: 15px; text-align: center;\"> <h2 style=\"color: #4f46e5;\">¡Tu acceso a Mermaid AI está listo!</h2> <p>Escanea este código con tu móvil (conectado a la misma red WiFi) para ver tu perfil:</p> <img src=\"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{URL_PERFIL}}\" alt=\"Código QR\" style=\"border: 10px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);\" /> </div>\n\nAnade en el email tambien la informacion personal del usuario.\n\nIMPORTANTE: Sustituye {{URL_PERFIL}} por la URL que recibiste de la herramienta anterior.\n   \n\nNo inventes IDs. Si `create_user` no te da un ID, detente e infórmalo.",
           "maxIterations": 15
         }
       },
@@ -938,7 +938,7 @@
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "f1bfc271-8792-49c3-86b7-64bc3d33ea98",
+  "versionId": "29e15954-ef23-482c-bb26-882a07e279f0",
   "meta": {
     "instanceId": "50e908245cf6cca64bb82f82936896e49b0c1624b5b3352ac4dfa73bc56481dc"
   },

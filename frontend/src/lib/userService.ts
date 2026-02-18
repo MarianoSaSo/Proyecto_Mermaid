@@ -9,6 +9,7 @@ interface UserInfo {
   codigo_verificacion?: string;
   password?: string;
   created_at?: string;
+  codigo_qr?: string;
 }
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';

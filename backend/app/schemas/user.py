@@ -15,6 +15,7 @@ class UserResponse(UserBase):
     id: str
     conectado: bool
     created_at: Optional[str] = None
+    codigo_qr: Optional[str] = None
 
     class Config:
         from_attributes = True

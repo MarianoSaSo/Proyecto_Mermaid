@@ -12,8 +12,10 @@ import {
     ShieldCheck,
     ShieldAlert,
     Loader2,
-    ArrowLeft
+    ArrowLeft,
+    QrCode
 } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
@@ -26,6 +28,7 @@ interface UserInfo {
     nacionalidad?: string;
     conectado?: boolean;
     created_at?: string;
+    codigo_qr?: string;
 }
 
 interface UserProfileProps {
@@ -115,7 +118,7 @@ export default function UserProfile({ userId }: UserProfileProps) {
                             </div>
                         </div>
                     </div>
-                    <div className="mb-6">
+                    <div className="mb-4">
                         <h1 className="text-3xl font-extrabold text-gray-900 flex items-center gap-3">
                             {userInfo.nombre} {userInfo.apellidos}
                             {userInfo.conectado && (
@@ -125,7 +128,7 @@ export default function UserProfile({ userId }: UserProfileProps) {
                                 </span>
                             )}
                         </h1>
-                        <p className="text-gray-700 font-medium">ID: {userInfo.id}</p>
+                        <p className="text-gray-500 font-medium">ID: {userInfo.id}</p>
                     </div>
                 </div>
             </div>
@@ -165,6 +168,31 @@ export default function UserProfile({ userId }: UserProfileProps) {
                             Gestionar accesos
                         </button>
                     </div>
+
+                    {/* QR Code Section */}
+                    {true && (
+                        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center text-center">
+                            <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 mb-4">
+                                <QrCode className="w-6 h-6" />
+                            </div>
+                            <h3 className="text-sm font-bold text-gray-900 mb-2">Acceso Móvil Quick-Scan</h3>
+                            <p className="text-xs text-gray-500 mb-6">Escanea este código con tu teléfono para acceder directamente a tu perfil desde la misma red WiFi.</p>
+
+                            <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-inner mb-4">
+                                <QRCodeSVG
+                                    value={userInfo.codigo_qr || `http://192.168.0.91:3000/profile/${userInfo.id}`}
+                                    size={160}
+                                    level="H"
+                                    includeMargin={false}
+                                    className="rounded-lg"
+                                />
+                            </div>
+
+                            <p className="text-[10px] text-gray-400 font-mono break-all px-2">
+                                {userInfo.codigo_qr || `http://192.168.0.91:3000/profile/${userInfo.id}`}
+                            </p>
+                        </div>
+                    )}
                 </div>
 
                 {/* Right Column - Main Info */}
